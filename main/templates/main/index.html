@@ -1,10 +1,16 @@
 <form action="{% url 'index' %}" method="post">
     {% csrf_token %}
     {{ form }}
+    <input type="hidden" name="page" value="{{ page }}">
     <input type="submit" value="Submit" />
 </form>
 <h1>Results</h1>
-<table>
+{% for meta in data %}
+	<p>{{ meta.link }}</p>
+	<p>{{ meta.meta }}</p>
+	<div>-------------------------</div>
+{% endfor %}
+<!--<table>
 	<tr>
 		<th>kind</th>
 		<th>title</th>
@@ -35,5 +41,6 @@
 	{% endfor %}
 	
 </table>
+-->
 
 
