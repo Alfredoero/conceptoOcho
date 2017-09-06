@@ -1,16 +1,57 @@
-<form action="{% url 'index' %}" method="post">
-    {% csrf_token %}
-    {{ form }}
-    <input type="hidden" name="page" value="{{ page }}">
-    <input type="submit" value="Submit" />
-</form>
-<h1>Results</h1>
-{% for meta in data %}
-	<p>{{ meta.link }}</p>
-	<p>{{ meta.meta }}</p>
-	<div>-------------------------</div>
-{% endfor %}
-<!--<table>
+
+
+{% load static %}
+{% load bootstrap %}
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title></title>
+	<link rel="stylesheet" href="">
+	<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+	<script src="{% static 'js/jquery.min.js' %}"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.4/esm/popper.js"></script>
+	<script type="text/javascript" src="{% static 'js/bootstrap.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/jquery.steps.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/main.js' %}"></script>
+</head>
+<body>
+
+<div class="container">
+	<div class="row">
+		<div class="col-12">			
+			<div id="results">
+				<h1>Busqueda</h1>
+				<div>
+					<form action="{% url 'index' %}" method="post">
+					    {% csrf_token %}
+					    {{ form|bootstrap }}
+					    <input type="hidden" name="page" value="{{ page }}">
+					    <input type="submit" value="Submit" />
+					</form>
+				</div>
+				<h1>Resultados</h1>
+				<div>
+					{% for meta in data %}
+						<p>{{ meta.link }}</p>
+						<p>{{ meta.meta }}</p>
+						<div>-------------------------</div>
+					{% endfor %}							
+				</div>
+			</div>			
+		</div>
+	</div>
+</div>
+<script>
+	$("#results").steps();
+</script>
+
+</body>
+</html>
+<!--
+<table>
 	<tr>
 		<th>kind</th>
 		<th>title</th>
