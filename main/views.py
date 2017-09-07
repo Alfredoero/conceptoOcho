@@ -62,10 +62,9 @@ def check(request):
 							for key in first_keys:
 								coincidence = soup.findAll(key)
 								total_weight += len(coincidence)
+						metas.append(met.encode("utf-8"))
 					search.site_weight = total_weight
 					search.save() 
-
-						metas.append(met.encode("utf-8"))
 					all_metas.append({"link": link , "meta": metas})
 				except urllib.request.HTTPError as error:
 					all_metas.append({"link": link , "meta": "Forbidden %s" % error.code})
