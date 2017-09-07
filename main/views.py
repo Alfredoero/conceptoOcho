@@ -12,16 +12,7 @@ import pprint
 import json
 
 # Create your views here.
-def get_keywords(meta):
-	keywords = []
-	try:
-		contenido = met["content"]
-		content_list = contenido.split(",")
-		for key in content_list:
-			keywords.append(key)
-	except keyError:
-		pass
-	return 
+
 def run_script(url):
 
 	return
@@ -70,7 +61,13 @@ def check(request):
 					html_doc = urllib.request.urlopen(link)
 					soup = BeautifulSoup(html_doc, 'html.parser')                   
 					for met in soup.findAll(attrs={"name":"keywords"}):
-						keywors.append(get_keywords(met))
+						try:
+							contenido = met["content"]
+							content_list = contenido.split(",")
+							for key in content_list:
+								keywords.append(key)
+						except keyError:
+							pass
 						metas.append(met.encode("utf-8"))
 					all_metas.append({"link": link , "meta": metas})
 				except urllib.request.HTTPError as error:
