@@ -46,6 +46,7 @@ def check(request):
 					search = Search()
 					search.site_name = item["title"]
 					search.site_url = item["link"]
+					search.save()
 
 				
 			#for x in xrange(1, 10):
@@ -65,7 +66,7 @@ def check(request):
 							contenido = met["content"]
 							content_list = contenido.split(",")
 							for key in content_list:
-								keywords.append(key)
+								keywords.append(key.strip())
 						except keyError:
 							pass
 						metas.append(met.encode("utf-8"))
