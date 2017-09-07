@@ -11,12 +11,12 @@ import pprint
 import json
 
 # Create your views here.
-#def get_keywords(meta):
-#	try
-#		print(meta["content"])
-#	except keyError as error:
-#		pass
-#	return
+def get_keywords(meta):
+	try:
+		print(meta["content"])
+	except keyError as error:
+		pass
+	return
 def run_script(url):
 
 	return
@@ -58,7 +58,7 @@ def check1(request):
 					soup = BeautifulSoup(html_doc, 'html.parser')                   
 					for met in soup.findAll(attrs={"name":"keywords"}):
 						#get_keywords(met)
-						try
+						try:
 							contenido = met["content"]
 							content_list = contenido.split(",")
 							for key in content_list:
