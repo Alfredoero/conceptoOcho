@@ -22,6 +22,7 @@ def run_script(url):
 	return
 	
 def index(request):	
+	form = PostForm()
 	return render(request, 'main/index.html', {'form': form})
 
 def check1(request):
