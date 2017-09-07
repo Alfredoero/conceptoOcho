@@ -74,7 +74,7 @@ def check(request):
 					all_metas.append({"link": link , "meta": "Forbidden %s" % error.code})
 					#print "Forbidden %s" %(error.code)
 			#pprint.pprint(all_metas)
-			return render(request, 'main/check.html', {'page': page, 'data': keywords})
+			return render(request, 'main/check.html', {'page': page, 'data': keywords, 'metas': all_metas})
 	else:
 		form = PostForm()
 		return render(request, 'main/index.html', { 'form': form})

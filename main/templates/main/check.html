@@ -26,6 +26,16 @@
 				</div>
 			</div>
 		</div>
+		<div class="row">
+			<ul>
+				{% for item in metas %}
+					<li>
+					<p>{{ item.link }}</p>
+					<p>{{ item.meta }}</p>
+					</li>
+				{% endfor %}
+			</ul>
+		</div>
 	</div>
 </body>
 <script type="text/javascript">
