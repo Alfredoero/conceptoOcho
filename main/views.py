@@ -10,6 +10,7 @@ from bs4 import BeautifulSoup
 from googleapiclient.discovery import build
 import pprint
 import json
+import re
 
 # Create your views here.
 
@@ -65,7 +66,7 @@ def check(request):
 					if keys_count == 0:
 						first_keys = data.split(" ")							
 						for key in first_keys:							
-							total_weight += len(soup.findAll(key))
+							total_weight += len(soup.body.findAll(re.compile("^%s$" % key)))
 					search.site_weight = total_weight
 					search.save() 
 					all_metas.append({"link": item["link"] , "meta": metas, "keys_count": keys_count})
