@@ -60,16 +60,17 @@ def check(request):
 						except keyError:
 							pass							
 						metas.append(met.encode("utf-8"))
-					if len(soup.findAll(attrs={"name": "keywords"})) == 0:
-						first_keys = data.split(" ")							
-						for key in first_keys:
-							coincidence = soup.findAll(key)
-							total_weight += len(coincidence)
+					keys_count = len(soup.findAll(attrs={"name": "keywords"}))
+					#if len(soup.findAll(attrs={"name": "keywords"})) == 0:
+					#	first_keys = data.split(" ")							
+					#	for key in first_keys:
+					#		coincidence = soup.findAll(key)
+					#		total_weight += len(coincidence)
 					search.site_weight = total_weight
 					search.save() 
-					all_metas.append({"link": item["link"] , "meta": metas})
+					all_metas.append({"link": item["link"] , "meta": metas, "keys_count": keys_count})
 				except urllib.request.HTTPError as error:
-					all_metas.append({"link": item["link"] , "meta": "Forbidden %s" % error.code})
+					all_metas.append({"link": item["link"] , "meta": "Forbidden %s" % error.code, "keys_count": keys_count})
 				
 			#for x in xrange(1, 10):
 			#   n_total.append(x)
