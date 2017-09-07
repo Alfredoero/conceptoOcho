@@ -22,7 +22,7 @@ def run_script(url):
 	return
 	
 def index(request):	
-	return render(request, 'main/index.html', {'page': page, 'form': form})
+	return render(request, 'main/index.html', {'form': form})
 
 def check1(request):
 	page = 0
