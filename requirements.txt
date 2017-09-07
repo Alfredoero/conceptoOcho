@@ -1,11 +1,7 @@
-beautifulsoup4==4.6.0
-Django==1.11.4
-google-api-python-client==1.6.3
-httplib2==0.10.3
-oauth2client==4.1.2
-pyasn1==0.3.3
-pyasn1-modules==0.1.1
-pytz==2017.2
-rsa==3.4.2
+pbr==3.1.1
 six==1.10.0
-uritemplate==3.0.0
+stevedore==1.26.0
+virtualenv==15.1.0
+virtualenv-clone==0.2.6
+virtualenvwrapper==4.8.1
+virtualenvwrapper-win==1.2.1
