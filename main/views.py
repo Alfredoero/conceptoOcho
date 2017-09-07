@@ -65,7 +65,7 @@ def check(request):
 						metas.append(met.encode("utf-8"))
 					search.site_weight = total_weight
 					search.save() 
-					all_metas.append({"link": link , "meta": metas})
+					all_metas.append({"link": item["link"] , "meta": metas})
 				except urllib.request.HTTPError as error:
 					all_metas.append({"link": link , "meta": "Forbidden %s" % error.code})
 				
