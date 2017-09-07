@@ -8,6 +8,19 @@
 	<link rel="stylesheet" href="">
 </head>
 <body>
-	
+	<div class="container">
+		<div class="row">
+			<div class="col">
+				<h1>Resultados</h1>
+				<div>
+					{% for key in data %}
+					<div class="checkbox">
+					  	<label><input type="checkbox" value="{{ key }}">{{ key }}</label>
+					</div>
+					{% endfor %}							
+				</div>
+			</div>
+		</div>
+	</div>
 </body>
 </html>

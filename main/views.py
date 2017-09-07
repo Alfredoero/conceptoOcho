@@ -21,7 +21,10 @@ def run_script(url):
 
 	return
 	
-def index(request):
+def index(request):	
+	return render(request, 'main/index.html', {'page': page, 'form': form})
+
+def check1(request):
 	page = 0
 	if request.method == 'POST':
 		form = PostForm(request.POST)
@@ -35,7 +38,6 @@ def index(request):
 			res = service.cse().list( q=data, cx='011980423541542895616:ug0kbjbf6vm', gl=search_country, hq="near=%s" % search_city, cr=search_country, hl=search_country, filter="1", ).execute()
 			total = res["searchInformation"]["totalResults"]
 			#pprint.pprint(res)
-			print(total)
 			all_links = []
 			n_total = []
 			all_metas = []
@@ -47,25 +49,33 @@ def index(request):
 			#   res2 = service.cse().list( q=data, cx='011980423541542895616:ug0kbjbf6vm', gl='us', start=(x*10)+1, ).execute()
 			#   for item in res2["items"]:
 			#       all_links.append(item["link"])
-
+			keywords = []
 			for link in all_links:
 				metas = []
+
 				try:
 					html_doc = urllib.request.urlopen(link)
 					soup = BeautifulSoup(html_doc, 'html.parser')                   
 					for met in soup.findAll(attrs={"name":"keywords"}):
 						#get_keywords(met)
+						try
+							contenido = met["content"]
+							content_list = contenido.split(",")
+							for key in content_list:
+								keywords.append(key)
+						except keyError:
+							pass
 						metas.append(met.encode("utf-8"))
+
+
 					all_metas.append({"link": link , "meta": metas})
 				except urllib.request.HTTPError as error:
 					all_metas.append({"link": link , "meta": "Forbidden %s" % error.code})
 					#print "Forbidden %s" %(error.code)
 			#pprint.pprint(all_metas)
-			return render(request, 'main/index.html', {'page': page, 'data': all_metas, 'form': form})
+			return render(request, 'main/check1.html', {'page': page, 'data': keywords})
 	else:
 		form = PostForm()
-	return render(request, 'main/index.html', {'page': page, 'form': form})
-
-def check1(request):
+		return render(request, 'main/index.html', { 'form': form})
 	return render(request, 'main/check1.html', {})
 	

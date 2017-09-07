@@ -24,21 +24,13 @@
 			<div id="results">
 				<h1>Busqueda</h1>
 				<div>
-					<form action="{% url 'index' %}" method="post">
+					<form action="{% url 'check1' %}" method="post">
 					    {% csrf_token %}
 					    {{ form|bootstrap }}
 					    <input type="hidden" name="page" value="{{ page }}">
 					    <input type="submit" value="Submit" />
 					</form>
-				</div>
-				<h1>Resultados</h1>
-				<div>
-					{% for meta in data %}
-						<p>{{ meta.link }}</p>
-						<p>{{ meta.meta }}</p>
-						<div>-------------------------</div>
-					{% endfor %}							
-				</div>
+				</div>				
 			</div>			
 		</div>
 	</div>
