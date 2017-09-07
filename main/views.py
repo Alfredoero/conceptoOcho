@@ -54,7 +54,7 @@ def index(request):
 					html_doc = urllib.request.urlopen(link)
 					soup = BeautifulSoup(html_doc, 'html.parser')                   
 					for met in soup.findAll(attrs={"name":"keywords"}):
-						get_keywords(met)
+						#get_keywords(met)
 						metas.append(met.encode("utf-8"))
 					all_metas.append({"link": link , "meta": metas})
 				except urllib.request.HTTPError as error:
