@@ -3,7 +3,7 @@
 from __future__ import unicode_literals
 from django.http import HttpResponse
 from django.shortcuts import render
-import urllib.request as urllib
+import urllib.request
 from .forms import PostForm
 from bs4 import BeautifulSoup
 from googleapiclient.discovery import build
@@ -48,13 +48,13 @@ def index(request):
 			for link in all_links:
 				metas = []
 				try:
-					html_doc = urllib.urlopen(link)
+					html_doc = urllib.request.urlopen(link)
 					soup = BeautifulSoup(html_doc, 'html.parser')                   
 					for met in soup.findAll(attrs={"name":"keywords"}):
 						get_keywords(met)
 						metas.append(met.encode("utf-8"))
 					all_metas.append({"link": link , "meta": metas})
-				except urllib2.HTTPError as error:
+				except urllib.request.HTTPError as error:
 					all_metas.append({"link": link , "meta": "Forbidden %s" % error.code})
 					#print "Forbidden %s" %(error.code)
 			#pprint.pprint(all_metas)
