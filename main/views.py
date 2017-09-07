@@ -75,14 +75,16 @@ def check(request):
 					all_metas.append({"link": link , "meta": "Forbidden %s" % error.code})
 					#print "Forbidden %s" %(error.code)
 			#pprint.pprint(all_metas)
-			return render(request, 'main/check.html', {'page': page, 'data': list(set(keywords)), 'metas': all_metas})
+			return render(request, 'main/check.html', {'page': page, 'data': list(set(keywords)), 'do_search': data , 'search_city': search_city, 'search_country': search_country })
 	else:
 		form = PostForm()
 		return render(request, 'main/index.html', { 'form': form})
 
 def filter(request):
 	if request.method == 'POST':
-		pass
+		keys = request.POST.getlist('keys')
+
+		return render(request, 'main/check.html', {'page': page, 'data': list(set(keywords)), 'metas': all_metas})
 	else:
 		form = PostForm()
 		return render(request, 'main/index.html', {'form': form})

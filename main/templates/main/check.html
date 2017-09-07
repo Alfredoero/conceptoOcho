@@ -18,24 +18,18 @@
 					    {% csrf_token %}
 					    {% for key in data %}
 						<div class="checkbox">
-						  	<label><input type="checkbox" value="{{ key }}">{{ key }}</label>
+						  	<label><input type="checkbox" name="keys[]" value="{{ key }}">{{ key }}</label>
 						</div>
 						{% endfor %}
+						<input type="hidden" name="do_search" value="{{ data }}"/>
+						<input type="hidden" name="search_city" value="{{ search_city }}"/>
+						<input type="hidden" name="search_country" value="{{ search_country }}"/>
 					    <input type="submit" value="Submit" />
 					</form>					
 				</div>
 			</div>
 		</div>
-		<div class="row">
-			<ul>
-				{% for item in metas %}
-					<li>
-					<p>{{ item.link }}</p>
-					<p>{{ item.meta }}</p>
-					</li>
-				{% endfor %}
-			</ul>
-		</div>
+		
 	</div>
 </body>
 <script type="text/javascript">
