@@ -5,4 +5,7 @@ from django.contrib import admin
 from main.models import Search
 # Register your models here.
 
-admin.site.register(Search)
+class SearchAdmin(admin.ModelAdmin):
+    list_display = ('site_title')
+
+admin.site.register(Search, SearchAdmin)
