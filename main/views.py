@@ -65,4 +65,7 @@ def index(request):
 	else:
 		form = PostForm()
 	return render(request, 'main/index.html', {'page': page, 'form': form})
+
+def check1(request)
+	return render(request, 'main/check1.html', {})
 	
