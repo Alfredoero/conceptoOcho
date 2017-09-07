@@ -6,6 +6,6 @@ from main.models import Search
 # Register your models here.
 
 class SearchAdmin(admin.ModelAdmin):
-    list_display = ('site_title')
+    list_display = ('site_name', 'site_url')
 
 admin.site.register(Search, SearchAdmin)
