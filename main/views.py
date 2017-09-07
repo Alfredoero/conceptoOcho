@@ -46,7 +46,6 @@ def check(request):
 				try:
 					html_doc = urllib.request.urlopen(item["link"])
 					soup = BeautifulSoup(html_doc, 'html.parser')
-					total_weight = 0
 					for met in soup.findAll(attrs={"name":"keywords"}):
 						try:
 							contenido = met["content"]
@@ -55,11 +54,11 @@ def check(request):
 								keywords.append(key.strip())
 						except keyError:
 							pass							
-						metas.append(met.encode("utf-8"))					
+						metas.append(met.encode("utf-8"))
 					
-					all_metas.append({"link": item["link"] , "meta": metas, "keys_count": keys_count})
+					all_metas.append({"link": item["link"] , "meta": metas})
 				except urllib.request.HTTPError as error:
-					all_metas.append({"link": item["link"] , "meta": "Forbidden %s" % error.code, "keys_count": keys_count})
+					all_metas.append({"link": item["link"] , "meta": "Forbidden %s" % error.code})
 				try:
 					search = Search.objects.get(site_name=item["link"])					
 				except Search.DoesNotExist as e:					
