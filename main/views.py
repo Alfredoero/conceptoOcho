@@ -61,6 +61,7 @@ def check(request):
 							pass							
 						metas.append(met.encode("utf-8"))
 					keys_count = len(soup.findAll(attrs={"name": "keywords"}))
+					total_weight = 0
 					if keys_count == 0:
 						first_keys = data.split(" ")							
 						for key in first_keys:							
