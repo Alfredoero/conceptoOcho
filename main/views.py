@@ -45,22 +45,12 @@ def check(request):
 				except Search.DoesNotExist as e:					
 					search = Search()
 					search.site_name = item["title"]
-					search.site_url = item["link"]
-					search.save()
-
-				
-			#for x in xrange(1, 10):
-			#   n_total.append(x)
-			#   res2 = service.cse().list( q=data, cx='011980423541542895616:ug0kbjbf6vm', gl='us', start=(x*10)+1, ).execute()
-			#   for item in res2["items"]:
-			#       all_links.append(item["link"])
-			
-			for link in all_links:
+					search.site_url = item["link"]					
 				metas = []
-
 				try:
-					html_doc = urllib.request.urlopen(link)
-					soup = BeautifulSoup(html_doc, 'html.parser')                   
+					html_doc = urllib.request.urlopen(item["link"])
+					soup = BeautifulSoup(html_doc, 'html.parser')
+					total_weight = 0
 					for met in soup.findAll(attrs={"name":"keywords"}):
 						try:
 							contenido = met["content"]
@@ -68,11 +58,26 @@ def check(request):
 							for key in content_list:
 								keywords.append(key.strip())
 						except keyError:
-							pass
+							first_keys = data.split(" ")							
+							for key in first_keys:
+								coincidence = soup.findAll(key)
+								total_weight += len(coincidence)
+					search.site_weight = total_weight
+					search.save() 
+
 						metas.append(met.encode("utf-8"))
 					all_metas.append({"link": link , "meta": metas})
 				except urllib.request.HTTPError as error:
 					all_metas.append({"link": link , "meta": "Forbidden %s" % error.code})
+				
+			#for x in xrange(1, 10):
+			#   n_total.append(x)
+			#   res2 = service.cse().list( q=data, cx='011980423541542895616:ug0kbjbf6vm', gl='us', start=(x*10)+1, ).execute()
+			#   for item in res2["items"]:
+			#       all_links.append(item["link"])
+			
+			
+				
 					#print "Forbidden %s" %(error.code)
 			#pprint.pprint(all_metas)
 			return render(request, 'main/check.html', {'page': page, 'data': list(set(keywords)), 'do_search': data , 'search_city': search_city, 'search_country': search_country })
