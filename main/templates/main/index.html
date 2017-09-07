@@ -24,7 +24,7 @@
 			<div id="results">
 				<h1>Busqueda</h1>
 				<div>
-					<form action="{% url 'check1' %}" method="post">
+					<form action="{% url 'check' %}" method="post">
 					    {% csrf_token %}
 					    {{ form|bootstrap }}
 					    <input type="hidden" name="page" value="{{ page }}">

@@ -20,5 +20,6 @@ from main import views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', views.index, name='index'),    
-    url(r'^check1/$', views.check1, name='check1')
+    url(r'^check/$', views.check, name='check')   
+    url(r'^filter/$', views.filter, name='filter')
 ]

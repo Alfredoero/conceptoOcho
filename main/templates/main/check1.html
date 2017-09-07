@@ -13,14 +13,22 @@
 			<div class="col">
 				<h1>Resultados</h1>
 				<div>
-					{% for key in data %}
-					<div class="checkbox">
-					  	<label><input type="checkbox" value="{{ key }}">{{ key }}</label>
-					</div>
-					{% endfor %}							
+
+					<form action="{% url 'filter' %}" method="post">
+					    {% csrf_token %}
+					    {% for key in data %}
+						<div class="checkbox">
+						  	<label><input type="checkbox" value="{{ key }}">{{ key }}</label>
+						</div>
+						{% endfor %}
+					    <input type="submit" value="Submit" />
+					</form>					
 				</div>
 			</div>
 		</div>
 	</div>
 </body>
+<script type="text/javascript">
+	
+</script>
 </html>
