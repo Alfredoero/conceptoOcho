@@ -12,7 +12,10 @@ import json
 
 # Create your views here.
 def get_keywords(meta):
-	print(meta["content"])
+	try
+		print(meta["content"])
+	except keyError as error:
+		pass
 	return
 def run_script(url):
 
