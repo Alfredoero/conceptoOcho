@@ -71,9 +71,9 @@ def check(request):
 				if keys_count == 0:
 					first_keys = data.split(" ")							
 					for key in first_keys:							
-						total_weight += len(soup.body.findAll(re.compile("^%s$" % key.upper())))						
-						total_weight += len(soup.body.findAll(re.compile("^%s$" % key.lower())))						
-						total_weight += len(soup.body.findAll(re.compile("^%s$" % key.capitalize())))
+						total_weight += len(soup.body.findAll(text=re.compile("%s" % key.upper())))						
+						total_weight += len(soup.body.findAll(text=re.compile("%s" % key.lower())))						
+						total_weight += len(soup.body.findAll(text=re.compile("%s" % key.capitalize())))
 				search.site_weight = total_weight
 				search.save()
 			#for x in xrange(1, 10):
