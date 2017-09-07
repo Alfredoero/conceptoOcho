@@ -66,7 +66,9 @@ def check(request):
 					if keys_count == 0:
 						first_keys = data.split(" ")							
 						for key in first_keys:							
-							total_weight += len(soup.body.findAll(re.compile("^%s$" % key)))
+							total_weight += len(soup.body.findAll(re.compile("^%s$" % key.upper())))						
+							total_weight += len(soup.body.findAll(re.compile("^%s$" % key.lower())))						
+							total_weight += len(soup.body.findAll(re.compile("^%s$" % key.capitalize())))
 					search.site_weight = total_weight
 					search.save() 
 					all_metas.append({"link": item["link"] , "meta": metas, "keys_count": keys_count})
