@@ -35,9 +35,9 @@ def check(request):
 			language = form.cleaned_data['language'] 
 			page = request.POST.get("page")
 			service = build("customsearch", "v1", developerKey="AIzaSyBfsEcEcNt4wtZq7iM5LV2gWfwnSQAD0cA")
-			res = service.cse().list( q=data, cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()
+			res = service.cse().list( q="%s+-filetype:pdf" % data, cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()
 			total = res["searchInformation"]["totalResults"]
-			#pprint.pprint(res)
+			print(res["queries"])
 			all_links = []
 			n_total = []
 			all_metas = []
@@ -102,7 +102,7 @@ def filter(request):
 		language = request.POST.get('language')
 		keys_string = ' '.join(keys)
 		service = build("customsearch", "v1", developerKey="AIzaSyBfsEcEcNt4wtZq7iM5LV2gWfwnSQAD0cA")
-		res = service.cse().list( q="%s %s" % (do_search, keys_string), cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language,  filter="1", ).execute()
+		res = service.cse().list( q="%s %s+-filetype:pdf" % (do_search, keys_string), cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language,  filter="1", ).execute()
 		contact = []
 		for item in res["items"]:
 			try:
