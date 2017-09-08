@@ -45,6 +45,7 @@ def check(request):
 				allow = True
 				all_links.append(item["link"])
 				metas = []
+				soup = ""
 				try:
 					html_doc = urllib.request.urlopen(item["link"])
 					soup = BeautifulSoup(html_doc, 'html.parser')
@@ -74,18 +75,16 @@ def check(request):
 						if keys_count == 0:
 							first_keys = data.split(" ")							
 							for key in first_keys:							
-								total_weight += len(soup.body.findAll(text=re.compile("%s" % key.upper())))						
-								total_weight += len(soup.body.findAll(text=re.compile("%s" % key.lower())))						
-								total_weight += len(soup.body.findAll(text=re.compile("%s" % key.capitalize())))
+								total_weight += len(soup.findAll(text=re.compile("%s" % key.upper())))						
+								total_weight += len(soup.findAll(text=re.compile("%s" % key.lower())))						
+								total_weight += len(soup.findAll(text=re.compile("%s" % key.capitalize())))
 						search.site_weight = total_weight
 					search.save()
 			#for x in xrange(1, 10):
 			#   n_total.append(x)
 			#   res2 = service.cse().list( q=data, cx='011980423541542895616:ug0kbjbf6vm', gl='us', start=(x*10)+1, ).execute()
 			#   for item in res2["items"]:
-			#       all_links.append(item["link"])
-			
-			
+			#       all_links.append(item["link"])			
 				
 					#print "Forbidden %s" %(error.code)
 			#pprint.pprint(all_metas)
@@ -103,7 +102,7 @@ def filter(request):
 		language = request.POST.get('language')
 		keys_string = ' '.join(keys)
 		service = build("customsearch", "v1", developerKey="AIzaSyBfsEcEcNt4wtZq7iM5LV2gWfwnSQAD0cA")
-		res = service.cse().list( q=do_search, cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language,  filter="1", orTerms=keys_string, ).execute()
+		res = service.cse().list( q="%s %s" % (do_search, keys_string), cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language,  filter="1", ).execute()
 		contact = []
 		for item in res["items"]:
 			try:
