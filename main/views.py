@@ -41,54 +41,58 @@ def check(request):
 			all_links = []
 			n_total = []
 			all_metas = []
-			for item in res["items"]:
-				allow = True
-				all_links.append(item["link"])
-				metas = []
-				soup = ""
-				try:
-					html_doc = urllib.request.urlopen(item["link"])
-					soup = BeautifulSoup(html_doc, 'html.parser')
-					for met in soup.findAll(attrs={"name":"keywords"}):
-						try:
-							contenido = met["content"]
-							content_list = contenido.split(",")
-							for key in content_list:
-								keywords.append(key.strip())
-						except KeyError:
-							pass							
-						metas.append(met.encode("utf-8"))
+			try:
+				for item in res["items"]:
+					allow = True
+					all_links.append(item["link"])
+					metas = []
+					soup = ""
+					try:
+						html_doc = urllib.request.urlopen(item["link"])
+						soup = BeautifulSoup(html_doc, 'html.parser')
+						for met in soup.findAll(attrs={"name":"keywords"}):
+							try:
+								contenido = met["content"]
+								content_list = contenido.split(",")
+								for key in content_list:
+									keywords.append(key.strip())
+							except KeyError:
+								pass							
+							metas.append(met.encode("utf-8"))
+						
+						all_metas.append({"link": item["link"] , "meta": metas})
+					except urllib.request.HTTPError as error:
+						allow = False
+						all_metas.append({"link": item["link"] , "meta": "Forbidden %s" % error.code})
+					except urllib.request.URLError as error:
+						allow = False
+					try:
+						search = Search.objects.get(site_url=item["link"])					
+					except Search.DoesNotExist as e:					
+						search = Search(site_name=item["title"], site_url=item["link"])
+						if allow: 
+							keys_count = len(soup.findAll(attrs={"name": "keywords"}))
+							total_weight = 0
+							if keys_count == 0:
+								first_keys = data.split(" ")							
+								for key in first_keys:							
+									total_weight += len(soup.findAll(text=re.compile("%s" % key.upper())))						
+									total_weight += len(soup.findAll(text=re.compile("%s" % key.lower())))						
+									total_weight += len(soup.findAll(text=re.compile("%s" % key.capitalize())))
+							search.site_weight = total_weight
+						search.save()
+				#for x in xrange(1, 10):
+				#   n_total.append(x)
+				#   res2 = service.cse().list( q=data, cx='011980423541542895616:ug0kbjbf6vm', gl='us', start=(x*10)+1, ).execute()
+				#   for item in res2["items"]:
+				#       all_links.append(item["link"])			
 					
-					all_metas.append({"link": item["link"] , "meta": metas})
-				except urllib.request.HTTPError as error:
-					allow = False
-					all_metas.append({"link": item["link"] , "meta": "Forbidden %s" % error.code})
-				except urllib.request.URLError as error:
-					allow = False
-				try:
-					search = Search.objects.get(site_url=item["link"])					
-				except Search.DoesNotExist as e:					
-					search = Search(site_name=item["title"], site_url=item["link"])
-					if allow: 
-						keys_count = len(soup.findAll(attrs={"name": "keywords"}))
-						total_weight = 0
-						if keys_count == 0:
-							first_keys = data.split(" ")							
-							for key in first_keys:							
-								total_weight += len(soup.findAll(text=re.compile("%s" % key.upper())))						
-								total_weight += len(soup.findAll(text=re.compile("%s" % key.lower())))						
-								total_weight += len(soup.findAll(text=re.compile("%s" % key.capitalize())))
-						search.site_weight = total_weight
-					search.save()
-			#for x in xrange(1, 10):
-			#   n_total.append(x)
-			#   res2 = service.cse().list( q=data, cx='011980423541542895616:ug0kbjbf6vm', gl='us', start=(x*10)+1, ).execute()
-			#   for item in res2["items"]:
-			#       all_links.append(item["link"])			
-				
-					#print "Forbidden %s" %(error.code)
-			#pprint.pprint(all_metas)
-			return render(request, 'main/check.html', {'page': page, 'data': list(set(keywords)), 'do_search': data , 'search_city': search_city, 'search_country': search_country, "language": language, "metas": all_metas })
+						#print "Forbidden %s" %(error.code)
+				#pprint.pprint(all_metas)
+				return render(request, 'main/check.html', {'page': page, 'data': list(set(keywords)), 'do_search': data , 'search_city': search_city, 'search_country': search_country, "language": language, "metas": all_metas })
+			except KeyError as e:
+				return render(request, 'main/check.html', {'noitems': "No results %s" % e })
+			
 	else:
 		form = PostForm()
 		return render(request, 'main/index.html', { 'form': form})
