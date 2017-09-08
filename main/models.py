@@ -9,5 +9,6 @@ class Search(models.Model):
 	site_name = models.CharField(max_length=300)
 	site_url = models.CharField(max_length=2000)
 	site_weight = models.CharField(max_length=10, blank=True, null=True)
+	site_status = models.CharField(max_length=200, blank=True, null=True)
 
 
