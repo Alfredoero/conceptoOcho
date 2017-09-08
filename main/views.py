@@ -63,7 +63,7 @@ def check(request):
 				except urllib.request.URLError as error:
 					allow = False
 				try:
-					search = Search.objects.get(site_name=item["link"])					
+					search = Search.objects.get(site_url=item["link"])					
 				except Search.DoesNotExist as e:					
 					search = Search(site_name=item["title"], site_url=item["link"])
 					if allow: 
@@ -104,7 +104,7 @@ def filter(request):
 		contact = []
 		for item in res["items"]:
 			try:
-				search = Search.objects.get(site_name=item["link"])
+				search = Search.objects.get(site_url=item["link"])
 			except Search.DoesNotExist as e:
 				search = Search(site_name=item["title"], site_url=item["link"])
 				search.save()
