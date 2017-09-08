@@ -31,9 +31,10 @@ def check(request):
 			data = form.cleaned_data['do_search']			
 			search_city = form.cleaned_data['search_city']
 			search_country = form.cleaned_data['search_country'] 
+			language = form.cleaned_data['language'] 
 			page = request.POST.get("page")
 			service = build("customsearch", "v1", developerKey="AIzaSyBfsEcEcNt4wtZq7iM5LV2gWfwnSQAD0cA")
-			res = service.cse().list( q=data, cx='011980423541542895616:ug0kbjbf6vm', gl=search_country, hq="near=%s" % search_city, cr=search_country, hl=search_country, filter="1", ).execute()
+			res = service.cse().list( q=data, cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()
 			total = res["searchInformation"]["totalResults"]
 			#pprint.pprint(res)
 			all_links = []
@@ -87,7 +88,7 @@ def check(request):
 				
 					#print "Forbidden %s" %(error.code)
 			#pprint.pprint(all_metas)
-			return render(request, 'main/check.html', {'page': page, 'data': list(set(keywords)), 'do_search': data , 'search_city': search_city, 'search_country': search_country, "metas": all_metas })
+			return render(request, 'main/check.html', {'page': page, 'data': list(set(keywords)), 'do_search': data , 'search_city': search_city, 'search_country': search_country, "language": language, "metas": all_metas })
 	else:
 		form = PostForm()
 		return render(request, 'main/index.html', { 'form': form})
@@ -98,9 +99,10 @@ def filter(request):
 		do_search = request.POST.get('do_search')
 		search_city = request.POST.get('search_city')
 		search_country = request.POST.get('search_country')
+		language = request.POST.get('language')
 		keys_string = ' '.join(keys)
 		service = build("customsearch", "v1", developerKey="AIzaSyBfsEcEcNt4wtZq7iM5LV2gWfwnSQAD0cA")
-		res = service.cse().list( q=do_search, cx='011980423541542895616:ug0kbjbf6vm', gl=search_country, hq="near=%s" % search_city, cr=search_country, hl=search_country, filter="1", orTerms=keys_string, ).execute()
+		res = service.cse().list( q=do_search, cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language,  filter="1", orTerms=keys_string, ).execute()
 		contact = []
 		for item in res["items"]:
 			try:
