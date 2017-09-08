@@ -106,12 +106,15 @@ def filter(request):
 			except Search.DoesNotExist as e:
 				search = Search(site_name=item["title"], site_url=item["link"])
 				search.save()
-		for page in Search.objects.all():		
-			html_doc = urllib.request.urlopen(page.site_url)
-			soup = BeautifulSoup(html_doc, 'html.parser')
-			info = soup.body.findAll(text=re.compile('^(?:(?:\+?1\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])\s*\)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?$'))
-			email = soup.body.findAll(text=re.compile('(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'))
-			contact.append({"url": page.site_url, "info": info, 'email': email})
+		for page in Search.objects.all():
+			try:
+				html_doc = urllib.request.urlopen(page.site_url)
+				soup = BeautifulSoup(html_doc, 'html.parser')
+				info = soup.body.findAll(text=re.compile('^(?:(?:\+?1\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])\s*\)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?$'))
+				email = soup.body.findAll(text=re.compile('(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'))
+				contact.append({"url": page.site_url, "info": info, 'email': email})	
+			except urllib.request.HTTPError as error:
+				pass			
 
 		return render(request, 'main/filter.html', {'contact': contact })
 	else:
