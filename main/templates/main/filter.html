@@ -24,8 +24,13 @@
 						<p>{{ item.info }}</p>
 						<p>{{ item.email }}</p>
 						</li>
-					{% endfor %}2
+					{% endfor %}
 				</ul>
+				<p>
+					<form action="{% url 'index' %}" method="post">
+						<input type="submit" value="Atras">
+					</form>
+				</p>
 			</div>
 		</div>
 	</div>
