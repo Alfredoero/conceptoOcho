@@ -11,7 +11,7 @@
 	<div class="container">
 		<div class="row">
 			<div class="col">
-				<h1>Resultados</h1>
+				<h1>Filtrado</h1>
 				<div>
 
 					<form action="{% url 'filter' %}" method="post">
@@ -28,17 +28,6 @@
 					</form>					
 				</div>
 			</div>
-		</div>
-		<div class="row">
-			<ul>
-				{% for item in metas %}
-					<li>
-					<p>{{ item.link }}</p>
-					<p>{{ item.meta }}</p>
-					<p>{{ item.keys_count }}</p>
-					</li>
-				{% endfor %}
-			</ul>
 		</div>
 	</div>
 </body>

@@ -94,8 +94,26 @@ def check(request):
 def filter(request):
 	if request.method == 'POST':
 		keys = request.POST.getlist('keys')
+		do_search = request.POST.get('do_search')
+		search_city = request.POST.get('search_city')
+		search_country = request.POST.get('search_country')
+		keys_string = ' '.join(keys)
+		service = build("customsearch", "v1", developerKey="AIzaSyBfsEcEcNt4wtZq7iM5LV2gWfwnSQAD0cA")
+		res = service.cse().list( q=data, cx='011980423541542895616:ug0kbjbf6vm', gl=search_country, hq="near=%s" % search_city, cr=search_country, hl=search_country, filter="1", orTerms=keys_string, ).execute()
+		contact = []
+		for item in res["items"]:
+			try:
+				search = Search.objects.get(site_name=item["title"])
+			except Search.DoesNotExist as e:
+				search = Search(site_name=item["title"], site_url=item["link"])
+				search.save()
+		for page in Search.objects.all():		
+			html_doc = urllib.request.urlopen(page.site_url)
+			soup = BeautifulSoup(html_doc, 'html.parser')
+			info = soup.body.find(text=re.compile('^(?:(?:\+?1\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])\s*\)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?$'))
+			contact.append({"url": page.site_url, "info": info })
 
-		return render(request, 'main/check.html', {'page': page, 'data': list(set(keywords)), 'metas': all_metas})
+		return render(request, 'main/filter.html', {'contact': contact })
 	else:
 		form = PostForm()
 		return render(request, 'main/index.html', {'form': form})
