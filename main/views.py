@@ -27,6 +27,7 @@ def check(request):
 	if request.method == 'POST':
 		form = PostForm(request.POST)
 		if form.is_valid():
+			Search.objects.all().delete()
 			keywords = []
 			data = form.cleaned_data['do_search']			
 			search_city = form.cleaned_data['search_city']
