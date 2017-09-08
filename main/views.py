@@ -96,7 +96,7 @@ def check(request):
 					return render(request, 'main/index.html', {'noitems': "No results %s" % e, 'form': form })
 			except HTTPError as e:
 				form = PostForm()
-				return render(request, 'main/index.html', {'limitreached': "You have reached the daily quota for your free plan. Please upgrade your plan" % e, 'form': form })
+				return render(request, 'main/index.html', {'limitreached': "You have reached the daily quota for your free plan. Please upgrade your plan. %s" % e, 'form': form })
 			
 			
 	else:
