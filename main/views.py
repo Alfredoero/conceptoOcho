@@ -99,7 +99,7 @@ def filter(request):
 		search_country = request.POST.get('search_country')
 		keys_string = ' '.join(keys)
 		service = build("customsearch", "v1", developerKey="AIzaSyBfsEcEcNt4wtZq7iM5LV2gWfwnSQAD0cA")
-		res = service.cse().list( q=data, cx='011980423541542895616:ug0kbjbf6vm', gl=search_country, hq="near=%s" % search_city, cr=search_country, hl=search_country, filter="1", orTerms=keys_string, ).execute()
+		res = service.cse().list( q=do_search, cx='011980423541542895616:ug0kbjbf6vm', gl=search_country, hq="near=%s" % search_city, cr=search_country, hl=search_country, filter="1", orTerms=keys_string, ).execute()
 		contact = []
 		for item in res["items"]:
 			try:
