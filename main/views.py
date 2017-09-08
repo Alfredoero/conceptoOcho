@@ -35,7 +35,7 @@ def check(request):
 			language = form.cleaned_data['language'] 
 			page = request.POST.get("page")
 			service = build("customsearch", "v1", developerKey="AIzaSyBfsEcEcNt4wtZq7iM5LV2gWfwnSQAD0cA")
-			res = service.cse().list( q="%s+-filetype:pdf" % data, cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()
+			res = service.cse().list( q="%s -filetype:pdf" % data, cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()
 			total = res["searchInformation"]["totalResults"]
 			print(res["queries"])
 			all_links = []
