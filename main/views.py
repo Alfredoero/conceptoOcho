@@ -91,7 +91,8 @@ def check(request):
 				#pprint.pprint(all_metas)
 				return render(request, 'main/check.html', {'page': page, 'data': list(set(keywords)), 'do_search': data , 'search_city': search_city, 'search_country': search_country, "language": language, "metas": all_metas })
 			except KeyError as e:
-				return render(request, 'main/check.html', {'noitems': "No results %s" % e })
+				form = PostForm()
+				return render(request, 'main/index.html', {'noitems': "No results %s" % e, 'form': form })
 			
 	else:
 		form = PostForm()
