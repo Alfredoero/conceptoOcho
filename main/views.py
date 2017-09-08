@@ -41,7 +41,6 @@ def check(request):
 			all_metas = []
 			for item in res["items"]:
 				all_links.append(item["link"])
-
 				metas = []
 				try:
 					html_doc = urllib.request.urlopen(item["link"])
@@ -62,20 +61,17 @@ def check(request):
 				try:
 					search = Search.objects.get(site_name=item["link"])					
 				except Search.DoesNotExist as e:					
-					search = Search()
-					search.site_name = item["title"]
-					search.site_url = item["link"]
+					search = Search(site_name=item["title"], site_url=item["link"])
+					keys_count = len(soup.findAll(attrs={"name": "keywords"}))
+					total_weight = 0
+					if keys_count == 0:
+						first_keys = data.split(" ")							
+						for key in first_keys:							
+							total_weight += len(soup.body.findAll(text=re.compile("%s" % key.upper())))						
+							total_weight += len(soup.body.findAll(text=re.compile("%s" % key.lower())))						
+							total_weight += len(soup.body.findAll(text=re.compile("%s" % key.capitalize())))
+					search.site_weight = total_weight
 					search.save()
-				keys_count = len(soup.findAll(attrs={"name": "keywords"}))
-				total_weight = 0
-				if keys_count == 0:
-					first_keys = data.split(" ")							
-					for key in first_keys:							
-						total_weight += len(soup.body.findAll(text=re.compile("%s" % key.upper())))						
-						total_weight += len(soup.body.findAll(text=re.compile("%s" % key.lower())))						
-						total_weight += len(soup.body.findAll(text=re.compile("%s" % key.capitalize())))
-				search.site_weight = total_weight
-				search.save()
 			#for x in xrange(1, 10):
 			#   n_total.append(x)
 			#   res2 = service.cse().list( q=data, cx='011980423541542895616:ug0kbjbf6vm', gl='us', start=(x*10)+1, ).execute()
