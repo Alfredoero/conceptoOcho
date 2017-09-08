@@ -52,7 +52,7 @@ def check(request):
 							content_list = contenido.split(",")
 							for key in content_list:
 								keywords.append(key.strip())
-						except keyError:
+						except KeyError:
 							pass							
 						metas.append(met.encode("utf-8"))
 					
