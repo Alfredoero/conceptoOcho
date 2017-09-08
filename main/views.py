@@ -60,6 +60,8 @@ def check(request):
 				except urllib.request.HTTPError as error:
 					allow = False
 					all_metas.append({"link": item["link"] , "meta": "Forbidden %s" % error.code})
+				except urllib.request.URLError as error:
+					allow = False
 				try:
 					search = Search.objects.get(site_name=item["link"])					
 				except Search.DoesNotExist as e:					
