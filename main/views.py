@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from django.http import HttpResponse, htt
+from django.http import HttpResponse
 from django.shortcuts import render
 import urllib.request
 from .forms import PostForm
