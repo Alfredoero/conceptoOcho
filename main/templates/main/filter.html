@@ -27,7 +27,8 @@
 					{% endfor %}
 				</ul>
 				<p>
-					<form action="{% url 'index' %}" method="post">
+					<form action="{% url 'index' %}" method="post">					
+					    {% csrf_token %}
 						<input type="submit" value="Atras">
 					</form>
 				</p>
