@@ -40,6 +40,7 @@ def check(request):
 			n_total = []
 			all_metas = []
 			for item in res["items"]:
+				allow = True
 				all_links.append(item["link"])
 				metas = []
 				try:
@@ -57,20 +58,22 @@ def check(request):
 					
 					all_metas.append({"link": item["link"] , "meta": metas})
 				except urllib.request.HTTPError as error:
+					allow = False
 					all_metas.append({"link": item["link"] , "meta": "Forbidden %s" % error.code})
 				try:
 					search = Search.objects.get(site_name=item["link"])					
 				except Search.DoesNotExist as e:					
 					search = Search(site_name=item["title"], site_url=item["link"])
-					keys_count = len(soup.findAll(attrs={"name": "keywords"}))
-					total_weight = 0
-					if keys_count == 0:
-						first_keys = data.split(" ")							
-						for key in first_keys:							
-							total_weight += len(soup.body.findAll(text=re.compile("%s" % key.upper())))						
-							total_weight += len(soup.body.findAll(text=re.compile("%s" % key.lower())))						
-							total_weight += len(soup.body.findAll(text=re.compile("%s" % key.capitalize())))
-					search.site_weight = total_weight
+					if allow: 
+						keys_count = len(soup.findAll(attrs={"name": "keywords"}))
+						total_weight = 0
+						if keys_count == 0:
+							first_keys = data.split(" ")							
+							for key in first_keys:							
+								total_weight += len(soup.body.findAll(text=re.compile("%s" % key.upper())))						
+								total_weight += len(soup.body.findAll(text=re.compile("%s" % key.lower())))						
+								total_weight += len(soup.body.findAll(text=re.compile("%s" % key.capitalize())))
+						search.site_weight = total_weight
 					search.save()
 			#for x in xrange(1, 10):
 			#   n_total.append(x)
