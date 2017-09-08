@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from django.http import HttpResponse
+from django.http import HttpResponse, htt
 from django.shortcuts import render
 import urllib.request
 from .forms import PostForm
 from .models import Search
 from bs4 import BeautifulSoup
 from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
 import pprint
 import json
 import re
@@ -94,7 +95,7 @@ def check(request):
 				except KeyError as e:
 					form = PostForm()
 					return render(request, 'main/index.html', {'noitems': "No results %s" % e, 'form': form })
-			except build.HttpError as e:
+			except HttpError as e:
 				form = PostForm()
 				return render(request, 'main/index.html', {'limitreached': "You have reached the daily quota for your free plan. Please upgrade your plan. %s" % e, 'form': form })
 			
