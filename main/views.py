@@ -94,7 +94,7 @@ def check(request):
 				except KeyError as e:
 					form = PostForm()
 					return render(request, 'main/index.html', {'noitems': "No results %s" % e, 'form': form })
-			except googleapiclient.error.HttpError as e:
+			except HttpError as e:
 				form = PostForm()
 				return render(request, 'main/index.html', {'limitreached': "You have reached the daily quota for your free plan. Please upgrade your plan. %s" % e, 'form': form })
 			
