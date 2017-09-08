@@ -104,7 +104,7 @@ def filter(request):
 		contact = []
 		for item in res["items"]:
 			try:
-				search = Search.objects.get(site_name=item["title"])
+				search = Search.objects.get(site_name=item["link"])
 			except Search.DoesNotExist as e:
 				search = Search(site_name=item["title"], site_url=item["link"])
 				search.save()
