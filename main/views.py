@@ -129,7 +129,7 @@ def get_info(url):
 		new_url = "%s//%s/" % (splited_url[0], splited_url[2])
 		contact = get_links(new_url)
 		if contact["error"] != "No response":
-			for cont in list(set(contact)):
+			for cont in list(set(contact['links'])):
 				if valid_url(cont):
 					html_doc = urllib.request.urlopen(cont)
 					soup = BeautifulSoup(html_doc, 'html.parser')
