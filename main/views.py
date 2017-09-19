@@ -109,7 +109,7 @@ def get_links(url):
 		page = urllib.request.urlopen(url)
 		soup_links = BeautifulSoup(page, 'html.parser')		   
 		links = [item['href'] for item in soup_links.findAll('a', href=True)]
-		contact = [x for x in links if "contact" in s]
+		contact = [x for x in links if "contact" in x]
 		return contact
 	except urllib.request.HTTPError as error:
 		return "no response"
