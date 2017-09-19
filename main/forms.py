@@ -241,7 +241,7 @@ COUNTRY_CHOICES = (
 	("zm", "Zambia"),
 	("zw", "Zimbabwe"),
 )
-CR_CHOICES = (
+CR_CHOICES_2 = (
 	("countryAF", "Afghanistan"), 
 	("countryAL", "Albania"), 
 	("countryDZ", "Algeria"), 
@@ -485,7 +485,10 @@ CR_CHOICES = (
 	("countryZM", "Zambia"), 
 	("countryZW", "Zimbabwe"), 
 )
-LANG_CHOICES = (
+CR_CHOICES = (
+	("countryUS", "United States"), 
+)
+LANG_CHOICES_2 = (
 	("af", "Afrikaans"),
 	("sq", "Albanian"),
 	("sm", "Amharic"),
@@ -569,6 +572,10 @@ LANG_CHOICES = (
 	("cy", "Welsh"),
 	("xh", "Xhosa"),
 	("zu", "Zulu"),
+)
+LANG_CHOICES = (
+	("en", "English"),
+	("es", "Spanish"),
 )
 class PostForm(forms.Form):
 	do_search = forms.CharField(label='Search', max_length=200)

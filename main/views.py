@@ -126,7 +126,7 @@ def valid_url(url):
 def get_info(url):
 	try:
 		splited_url = url.split("/")
-		new_url = "%s//%s/" % (splited_url[0], splited_url[2])
+		new_url = "%s//%s" % (splited_url[0], splited_url[2])
 		contacto = get_links(new_url)
 		if contacto["error"] != "No response":
 			for cont in list(set(contacto['links'])):
@@ -139,7 +139,7 @@ def get_info(url):
 				#elif cont == "":
 				#	return {"url": contact["url"], "info": "No Valid or empty", "email": "No Valid or empty URL"}
 				else:
-					return {"url": cont, "info": "No Valid URL on links", "email": "No Valid URL on links"}
+					return {"url": contacto["links"], "info": "No Valid URL on links", "email": "No Valid URL on links"}
 		else:
 			return {"url": contact["url"], "info": "No Response from contact", 'email': "No Response from contact"}
 	except urllib.request.HTTPError as error:
