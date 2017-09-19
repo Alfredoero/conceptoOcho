@@ -135,7 +135,10 @@ def get_info(url):
 				if "http" in cont:					
 					url_contact = cont
 				else:
-					url_contact = "%s%s" % (new_url, cont)
+					if "/" not in cont
+						url_contact = "%s/%s" % (new_url, cont)
+					else:
+						url_contact = "%s%s" % (new_url, cont)
 
 				if valid_url(url_contact):
 					html_doc = urllib.request.urlopen(url_contact)
