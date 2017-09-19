@@ -112,9 +112,9 @@ def get_links(url):
 		soup_links = BeautifulSoup(page, 'html.parser')		   
 		links = [item['href'] for item in soup_links.findAll('a', href=True)]
 		contact = [x for x in links if "contact" in x]
-		return contact
+		return {"url": url, "links": contact, "error": ""}
 	except urllib.request.HTTPError as error:
-		return "no response"
+		return {"url": url, "links": contact, "error": "No response"}
 def valid_url(url):
 	val = URLValidator()
 	try:
@@ -128,23 +128,24 @@ def get_info(url):
 		splited_url = url.split("/")
 		new_url = "%s//%s/" % (splited_url[0], splited_url[2])
 		contact = get_links(new_url)
-		if contact != "no response":
-
+		if contact["error"] != "No response":
 			for cont in list(set(contact)):
 				if valid_url(cont):
 					html_doc = urllib.request.urlopen(cont)
 					soup = BeautifulSoup(html_doc, 'html.parser')
 					info = soup.findAll(text=re.compile('^(?:(?:\+?1\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])\s*\)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?$'))
 					email = soup.findAll(text=re.compile('(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'))
-					return {"url": cont, "info": info, 'email': email}
+					return {"url": contact["url"], "info": info, 'email': email}
+				else if cont == "":
+					return {"url": contact["url"], "info": "No Valid or empty", "email": "No Valid or empty URL"}
 				else:
-					return {"url": new_url, "info": "Non Valid URL", "email": "Non Valid URL"}
+					return {"url": cont, "info": "No Valid URL", "email": "No Valid URL"}
 		else:
-			return {"url": new_url, "info": "No Response", 'email': "No Response"}
+			return {"url": contact["url"], "info": "No Response", 'email': "No Response"}
 	except urllib.request.HTTPError as error:
 		return {"url": new_url, "info": "No Response", "email": "No Response from server"}
 	except urllib.request.URLError as UrlError:
-		return {"url": new_url, "info": "Non Valid URL", "email": "Non Valid URL"}
+		return {"url": new_url, "info": "No Valid URL", "email": "No Valid URL"}
 	return 
 
 
