@@ -152,7 +152,7 @@ def get_info(url):
 					return {"url": contacto["links"], "info": "No Valid URL on links %s" % url_contact, "email": "No Valid URL on links %s" % url_contact}
 
 		else:
-			return {"url": contact["url"], "info": "Error %s" % contact["error"], 'email': "Error %s" % contact["error"]}
+			return {"url": contacto["url"], "info": "Error %s" % contacto["error"], 'email': "Error %s" % contacto["error"]}
 	except urllib.request.HTTPError as error:
 		return {"url": new_url, "info": "No Response from server", "email": "No Response from server"}
 	except urllib.request.URLError as UrlError:
