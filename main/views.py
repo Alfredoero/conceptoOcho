@@ -135,7 +135,7 @@ def get_info(url):
 				if "http" in cont:					
 					url_contact = cont
 				else:
-					if "/" not in cont
+					if "/" not in cont:
 						url_contact = "%s/%s" % (new_url, cont)
 					else:
 						url_contact = "%s%s" % (new_url, cont)
