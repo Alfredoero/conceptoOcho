@@ -24,6 +24,7 @@
 						<p><strong>Link:</strong> {{ item.url }}</p>
 						<p><strong>Telefonos:</strong> {{ item.info }}</p>
 						<p><strong>Correos:</strong> {{ item.email }}</p>
+						<p><strong>Links de contacto</strong> {% if item.found %}{{ item.found }}{% else %}No itmes found{% endif %}</p>
 						</li>
 					{% endfor %}
 				</ul>
