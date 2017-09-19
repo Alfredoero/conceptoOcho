@@ -116,7 +116,7 @@ def get_links(url):
 	except urllib.request.HTTPError as error:
 		return "no response"
 def valid_url(url):
-	val = URLValidator(verify_exist=False)
+	val = URLValidator(verify_exists=False)
 	try:
 		val(url)
 	except ValidationError as e:
