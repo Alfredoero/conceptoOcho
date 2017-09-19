@@ -104,6 +104,32 @@ def check(request):
 		form = PostForm()
 		return render(request, 'main/index.html', { 'form': form})
 
+def get_links(url):
+	try:		
+		page = urllib.request.urlopen(url)
+		soup_links = BeautifulSoup(page, 'html.parser')		   
+		links = [item['href'] for item in soup_links.findAll('a', href=True)]
+		contact = [x for x in links if "contact" in s]
+		return contact
+	except urllib.request.HTTPError as error:
+		return "no response"
+
+def get_info(url):
+	try:
+		splited_url = url.split("/")
+		new_url = "%s//%s/" % (splited_url[0], splited_url[2])
+		contact = get_links(new_url)
+		for cont in contact:
+			html_doc = urllib.request.urlopen(cont)
+			soup = BeautifulSoup(html_doc, 'html.parser')
+			info = soup.findAll(text=re.compile('^(?:(?:\+?1\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])\s*\)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?$'))
+			email = soup.findAll(text=re.compile('(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'))
+			return {"url": contact, "info": info, 'email': email}
+	except urllib.request.HTTPError as error:
+		pass			
+	return 
+
+
 def filter(request):
 	if request.method == 'POST':
 		keys = request.POST.getlist('keys')
@@ -122,15 +148,8 @@ def filter(request):
 				search = Search(site_name=item["title"], site_url=item["link"])
 				search.save()
 		for page in Search.objects.all():
-			try:
-				html_doc = urllib.request.urlopen(page.site_url)
-				soup = BeautifulSoup(html_doc, 'html.parser')
-				info = soup.findAll(text=re.compile('^(?:(?:\+?1\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])\s*\)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?$'))
-				email = soup.findAll(text=re.compile('(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'))
-				contact.append({"url": page.site_url, "info": info, 'email': email})	
-			except urllib.request.HTTPError as error:
-				pass			
-
+			contact.append(get_info(page.site_url))
+			
 		return render(request, 'main/filter.html', {'contact': contact })
 	else:
 		form = PostForm()
