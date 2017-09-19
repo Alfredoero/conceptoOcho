@@ -126,7 +126,9 @@ def get_info(url):
 			email = soup.findAll(text=re.compile('(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'))
 			return {"url": contact, "info": info, 'email': email}
 	except urllib.request.HTTPError as error:
-		pass			
+		return {"url": error, "info": "No info", "email": "no email"}
+	except urllib.request.URLError as UrlError:
+		return {"url": error, "info": "No info", "email": "no email"}
 	return 
 
 
