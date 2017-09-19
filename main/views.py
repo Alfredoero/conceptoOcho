@@ -114,7 +114,7 @@ def get_links(url):
 		contact = [x for x in links if "contact" or "Contact" or "CONTACT" in x]
 		return {"url": url, "links": contact, "error": ""}
 	except urllib.request.HTTPError as error:
-		return {"url": url, "links": "No response", "error": "No response"}
+		return {"url": url, "links": "No response from links", "error": "No response from links"}
 def valid_url(url):
 	val = URLValidator()
 	try:
@@ -127,25 +127,25 @@ def get_info(url):
 	try:
 		splited_url = url.split("/")
 		new_url = "%s//%s/" % (splited_url[0], splited_url[2])
-		contact = get_links(new_url)
-		if contact["error"] != "No response":
-			for cont in list(set(contact['links'])):
+		contacto = get_links(new_url)
+		if contacto["error"] != "No response":
+			for cont in list(set(contacto['links'])):
 				if valid_url(cont):
 					html_doc = urllib.request.urlopen(cont)
 					soup = BeautifulSoup(html_doc, 'html.parser')
 					info = soup.findAll(text=re.compile('^(?:(?:\+?1\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])\s*\)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?$'))
 					email = soup.findAll(text=re.compile('(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'))
-					return {"url": contact["url"], "info": info, 'email': email}
+					return {"url": contacto["url"], "info": info, 'email': email}
 				#elif cont == "":
 				#	return {"url": contact["url"], "info": "No Valid or empty", "email": "No Valid or empty URL"}
 				else:
-					return {"url": cont, "info": "No Valid URL", "email": "No Valid URL"}
+					return {"url": cont, "info": "No Valid URL on links", "email": "No Valid URL on links"}
 		else:
-			return {"url": contact["url"], "info": "No Response", 'email': "No Response"}
+			return {"url": contact["url"], "info": "No Response from contact", 'email': "No Response from contact"}
 	except urllib.request.HTTPError as error:
-		return {"url": new_url, "info": "No Response", "email": "No Response from server"}
+		return {"url": new_url, "info": "No Response from server", "email": "No Response from server"}
 	except urllib.request.URLError as UrlError:
-		return {"url": new_url, "info": "No Valid URL", "email": "No Valid URL"}
+		return {"url": new_url, "info": "No Valid URL on contact", "email": "No Valid URL on contact"}
 	return 
 
 
