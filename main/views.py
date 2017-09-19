@@ -130,8 +130,13 @@ def get_info(url):
 		contacto = get_links(new_url)
 		if contacto["error"] != "No response":
 			for cont in list(set(contacto['links'])):
-				if valid_url(cont):
-					html_doc = urllib.request.urlopen(cont)
+				if "http" in cont:					
+					url_contact = cont
+				else:
+					url_contact = "%s%s" % (new_url, cont)
+
+				if valid_url(url_contact):
+					html_doc = urllib.request.urlopen(url_contact)
 					soup = BeautifulSoup(html_doc, 'html.parser')
 					info = soup.findAll(text=re.compile('^(?:(?:\+?1\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])\s*\)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?$'))
 					email = soup.findAll(text=re.compile('(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'))
@@ -140,6 +145,7 @@ def get_info(url):
 				#	return {"url": contact["url"], "info": "No Valid or empty", "email": "No Valid or empty URL"}
 				else:
 					return {"url": contacto["links"], "info": "No Valid URL on links", "email": "No Valid URL on links"}
+
 		else:
 			return {"url": contact["url"], "info": "No Response from contact", 'email': "No Response from contact"}
 	except urllib.request.HTTPError as error:
