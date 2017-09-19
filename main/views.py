@@ -120,15 +120,18 @@ def get_info(url):
 		new_url = "%s//%s/" % (splited_url[0], splited_url[2])
 		contact = get_links(new_url)
 		for cont in contact:
-			html_doc = urllib.request.urlopen(cont)
-			soup = BeautifulSoup(html_doc, 'html.parser')
-			info = soup.findAll(text=re.compile('^(?:(?:\+?1\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])\s*\)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?$'))
-			email = soup.findAll(text=re.compile('(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'))
-			return {"url": contact, "info": info, 'email': email}
+			if cont != "no response":
+				html_doc = urllib.request.urlopen(cont)
+				soup = BeautifulSoup(html_doc, 'html.parser')
+				info = soup.findAll(text=re.compile('^(?:(?:\+?1\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])\s*\)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?$'))
+				email = soup.findAll(text=re.compile('(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'))
+				return {"url": cont, "info": info, 'email': email}
+			else:
+				return {"url": cont, "info": "No Response", 'email': "No Response"}
 	except urllib.request.HTTPError as error:
-		return {"url": error, "info": "No info", "email": "no email"}
+		return {"url": error, "info": "No Response", "email": "No Response from server"}
 	except urllib.request.URLError as UrlError:
-		return {"url": UrlError, "info": "No info", "email": "no email"}
+		return {"url": UrlError, "info": "Non Valid URL", "email": "Non Valid URL"}
 	return 
 
 
