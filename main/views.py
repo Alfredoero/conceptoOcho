@@ -114,7 +114,7 @@ def get_links(url):
 		contact = [x for x in links if "contact" or "Contact" or "CONTACT" in x]
 		return {"url": url, "links": contact, "error": ""}
 	except urllib.request.HTTPError as error:
-		return {"url": url, "links": contact, "error": "No response"}
+		return {"url": url, "links": "No response", "error": "No response"}
 def valid_url(url):
 	val = URLValidator()
 	try:
