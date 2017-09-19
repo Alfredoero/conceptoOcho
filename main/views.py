@@ -127,11 +127,11 @@ def get_info(url):
 				email = soup.findAll(text=re.compile('(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'))
 				return {"url": cont, "info": info, 'email': email}
 		else:
-			return {"url": cont, "info": "No Response", 'email': "No Response"}
+			return {"url": new_url, "info": "No Response", 'email': "No Response"}
 	except urllib.request.HTTPError as error:
-		return {"url": error, "info": "No Response", "email": "No Response from server"}
+		return {"url": new_url, "info": "No Response", "email": "No Response from server"}
 	except urllib.request.URLError as UrlError:
-		return {"url": UrlError, "info": "Non Valid URL", "email": "Non Valid URL"}
+		return {"url": new_url, "info": "Non Valid URL", "email": "Non Valid URL"}
 	return 
 
 
