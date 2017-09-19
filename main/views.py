@@ -93,7 +93,7 @@ def check(request):
 						
 							#print "Forbidden %s" %(error.code)
 					#pprint.pprint(all_metas)
-					return render(request, 'main/check.html', {'page': page, 'data': list(set(keywords)).sort(), 'do_search': data , 'search_city': search_city, 'search_country': search_country, "language": language, "metas": all_metas })
+					return render(request, 'main/check.html', {'page': page, 'data': sorted(list(set(keywords))), 'do_search': data , 'search_city': search_city, 'search_country': search_country, "language": language, "metas": all_metas })
 				except KeyError as e:
 					form = PostForm()
 					return render(request, 'main/index.html', {'noitems': "No results %s" % e, 'form': form })
