@@ -128,7 +128,7 @@ def get_info(url):
 	except urllib.request.HTTPError as error:
 		return {"url": error, "info": "No info", "email": "no email"}
 	except urllib.request.URLError as UrlError:
-		return {"url": error, "info": "No info", "email": "no email"}
+		return {"url": UrlError, "info": "No info", "email": "no email"}
 	return 
 
 
