@@ -119,7 +119,7 @@ def valid_url(url):
 	val = URLValidator(verify_exist=False)
 	try:
 		val(url)
-	except ValidationError, e:
+	except ValidationError as e:
 		return False
 	return True
 
