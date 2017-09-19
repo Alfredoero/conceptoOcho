@@ -9,6 +9,8 @@ from .models import Search
 from bs4 import BeautifulSoup
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+from django.core.validators import URLValidator
+from django.core.exceptions import ValidationError
 import pprint
 import json
 import re
@@ -113,6 +115,13 @@ def get_links(url):
 		return contact
 	except urllib.request.HTTPError as error:
 		return "no response"
+def valid_url(url):
+	val = URLValidator(verify_exist=False)
+	try:
+		val(url)
+	except ValidationError, e:
+		return False
+	return True
 
 def get_info(url):
 	try:
@@ -120,12 +129,16 @@ def get_info(url):
 		new_url = "%s//%s/" % (splited_url[0], splited_url[2])
 		contact = get_links(new_url)
 		if contact != "no response":
-			for cont in contact:
-				html_doc = urllib.request.urlopen(cont)
-				soup = BeautifulSoup(html_doc, 'html.parser')
-				info = soup.findAll(text=re.compile('^(?:(?:\+?1\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])\s*\)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?$'))
-				email = soup.findAll(text=re.compile('(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'))
-				return {"url": cont, "info": info, 'email': email}
+
+			for cont in list(set(contact)):
+				if valid_url(con):
+					html_doc = urllib.request.urlopen(cont)
+					soup = BeautifulSoup(html_doc, 'html.parser')
+					info = soup.findAll(text=re.compile('^(?:(?:\+?1\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])\s*\)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?$'))
+					email = soup.findAll(text=re.compile('(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'))
+					return {"url": cont, "info": info, 'email': email}
+				else:
+					return {"url": new_url, "info": "Non Valid URL", "email": "Non Valid URL"}
 		else:
 			return {"url": new_url, "info": "No Response", 'email': "No Response"}
 	except urllib.request.HTTPError as error:
