@@ -191,10 +191,9 @@ def filter(request):
 		for page in Search.objects.all():
 			contact.append(get_info(page.site_url))
 		more_search = yellowsearch("%s" % do_search, search_city)
+		yellow = []
 		if more_search["searchResult"]["metaProperties"]["message"] != "":
 			yellow = more_search["searchResult"]["searchListings"]["searchListing"]
-		else:
-			yellow = []
 		return render(request, 'main/filter.html', {'contact': contact, "yellow": yellow, "yellowmessage": more_search["searchResult"]["metaProperties"]["message"]})
 	else:
 		form = PostForm()
