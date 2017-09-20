@@ -11,19 +11,17 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
+import requests
 import pprint
 import json
 import re
 
+
 # Create your views here.
-
-def run_script(url):
-
-	return
-	
-def index(request):	
+def index(request):
 	form = PostForm()
 	return render(request, 'main/index.html', {'form': form})
+
 
 def check(request):
 	page = 0
@@ -32,16 +30,16 @@ def check(request):
 		if form.is_valid():
 			Search.objects.all().delete()
 			keywords = []
-			data = form.cleaned_data['do_search']			
+			data = form.cleaned_data['do_search']
 			search_city = form.cleaned_data['search_city']
-			search_country = form.cleaned_data['search_country'] 
-			language = form.cleaned_data['language'] 
+			search_country = form.cleaned_data['search_country']
+			language = form.cleaned_data['language']
 			page = request.POST.get("page")
 			try:
 				service = build("customsearch", "v1", developerKey="AIzaSyBfsEcEcNt4wtZq7iM5LV2gWfwnSQAD0cA")
 				res = service.cse().list( q="%s -filetype:pdf" % data, cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()
 				total = res["searchInformation"]["totalResults"]
-				#print(res["queries"])
+				# print(res["queries"])
 				all_links = []
 				n_total = []
 				all_metas = []
@@ -61,9 +59,9 @@ def check(request):
 									for key in content_list:
 										keywords.append(key.strip())
 								except KeyError:
-									pass							
+									pass
 								metas.append(met.encode("utf-8"))
-							
+
 							all_metas.append({"link": item["link"] , "meta": metas})
 						except urllib.request.HTTPError as error:
 							allow = False
@@ -71,28 +69,28 @@ def check(request):
 						except urllib.request.URLError as error:
 							allow = False
 						try:
-							search = Search.objects.get(site_url=item["link"])					
-						except Search.DoesNotExist as e:					
+							search = Search.objects.get(site_url=item["link"])
+						except Search.DoesNotExist as e:
 							search = Search(site_name=item["title"], site_url=item["link"])
-							if allow: 
+							if allow:
 								keys_count = len(soup.findAll(attrs={"name": "keywords"}))
 								total_weight = 0
 								if keys_count == 0:
-									first_keys = data.split(" ")							
-									for key in first_keys:							
-										total_weight += len(soup.findAll(text=re.compile("%s" % key.upper())))						
-										total_weight += len(soup.findAll(text=re.compile("%s" % key.lower())))						
+									first_keys = data.split(" ")
+									for key in first_keys:
+										total_weight += len(soup.findAll(text=re.compile("%s" % key.upper())))
+										total_weight += len(soup.findAll(text=re.compile("%s" % key.lower())))
 										total_weight += len(soup.findAll(text=re.compile("%s" % key.capitalize())))
 								search.site_weight = total_weight
 							search.save()
-					#for x in xrange(1, 10):
-					#   n_total.append(x)
-					#   res2 = service.cse().list( q=data, cx='011980423541542895616:ug0kbjbf6vm', gl='us', start=(x*10)+1, ).execute()
-					#   for item in res2["items"]:
-					#       all_links.append(item["link"])			
-						
-							#print "Forbidden %s" %(error.code)
-					#pprint.pprint(all_metas)
+						# for x in xrange(1, 10):
+						#   n_total.append(x)
+						#   res2 = service.cse().list( q=data, cx='011980423541542895616:ug0kbjbf6vm', gl='us', start=(x*10)+1, ).execute()
+						#   for item in res2["items"]:
+						#       all_links.append(item["link"])
+
+						# print "Forbidden %s" %(error.code)
+					# pprint.pprint(all_metas)
 					return render(request, 'main/check.html', {'page': page, 'data': sorted(list(set(keywords))), 'do_search': data , 'search_city': search_city, 'search_country': search_country, "language": language, "metas": all_metas })
 				except KeyError as e:
 					form = PostForm()
@@ -100,16 +98,15 @@ def check(request):
 			except HttpError as e:
 				form = PostForm()
 				return render(request, 'main/index.html', {'limitreached': "You have reached the daily quota for your free plan. Please upgrade your plan.", 'form': form })
-			
-			
 	else:
 		form = PostForm()
 		return render(request, 'main/index.html', { 'form': form})
 
+
 def get_links(url):
-	try:		
+	try:
 		page = urllib.request.urlopen(url)
-		soup_links = BeautifulSoup(page, 'html.parser')		   
+		soup_links = BeautifulSoup(page, 'html.parser')
 		links = [item['href'] for item in soup_links.findAll('a', href=True)]
 		contact = [x for x in links if "contact" in x]
 		contact += [x for x in links if "Contact" in x]
@@ -117,6 +114,8 @@ def get_links(url):
 		return {"url": url, "links": contact, "error": ""}
 	except urllib.request.HTTPError as error:
 		return {"url": url, "links": "No response %s" % url, "error": "No response %s" % url}
+
+
 def valid_url(url):
 	val = URLValidator()
 	try:
@@ -125,6 +124,7 @@ def valid_url(url):
 		return False
 	return True
 
+
 def get_info(url):
 	try:
 		splited_url = url.split("/")
@@ -132,7 +132,7 @@ def get_info(url):
 		contacto = get_links(new_url)
 		if contacto["error"] == "":
 			for cont in list(set(contacto['links'])):
-				if "http" in cont:					
+				if "http" in cont:
 					url_contact = cont
 				else:
 					if "/" in cont:
@@ -146,8 +146,6 @@ def get_info(url):
 					info = soup.findAll(text=re.compile('^(?:(?:\+?1\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])\s*\)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?$'))
 					email = soup.findAll(text=re.compile('(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'))
 					return {"url": contacto["url"], "info": info, 'email': email, "found": url_contact}
-				#elif cont == "":
-				#	return {"url": contact["url"], "info": "No Valid or empty", "email": "No Valid or empty URL"}
 				else:
 					return {"url": contacto["links"], "info": "No Valid URL on links %s" % url_contact, "email": "No Valid URL on links %s" % url_contact}
 
@@ -157,7 +155,12 @@ def get_info(url):
 		return {"url": new_url, "info": "No Response from server", "email": "No Response from server"}
 	except urllib.request.URLError as UrlError:
 		return {"url": new_url, "info": "No Valid URL on contact", "email": "No Valid URL on contact"}
-	return 
+	return
+
+
+def yellowsearch(search, city):
+	yellow_search = requests.get('http://api2.yp.com/listings/v1/search?searchloc=%s&term=%s&format=json&sort=name&radius=5&listingcount=25&key=5t4k08tttp' %(city, search))
+	return yellow_search.json()
 
 
 def filter(request):
@@ -169,7 +172,7 @@ def filter(request):
 		language = request.POST.get('language')
 		keys_string = ' '.join(keys)
 		service = build("customsearch", "v1", developerKey="AIzaSyBfsEcEcNt4wtZq7iM5LV2gWfwnSQAD0cA")
-		res = service.cse().list( q="%s %s -filetype:pdf" % (do_search, keys_string), cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language,  filter="1", ).execute()
+		res = service.cse().list(q="%s %s -filetype:pdf" % (do_search, keys_string), cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language,  filter="1", ).execute()
 		contact = []
 		for item in res["items"]:
 			try:
@@ -179,9 +182,9 @@ def filter(request):
 				search.save()
 		for page in Search.objects.all():
 			contact.append(get_info(page.site_url))
-			
-		return render(request, 'main/filter.html', {'contact': contact })
+		more_search = yellowsearch("%s" % do_search, search_city)
+
+		return render(request, 'main/filter.html', {'contact': contact, "yellow": more_search})
 	else:
 		form = PostForm()
 		return render(request, 'main/index.html', {'form': form})
-	

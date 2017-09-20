@@ -17,17 +17,28 @@
 	<div class="container">
 		<div class="row">
 			<div class="col">
-				<h1>Results</h1>
+				<h1>Google Results</h1>
 				<ul>
 					{% for item in contact %}
 						<li>
 						<p><strong>Link:</strong> {{ item.url }}</p>
-						<p><strong>Telefonos:</strong> {{ item.info }}</p>
-						<p><strong>Correos:</strong> {{ item.email }}</p>
-						<p><strong>Links de contacto</strong> {% if item.found %}{{ item.found }}{% else %}No itmes found{% endif %}</p>
+						<p><strong>Phones:</strong> {{ item.info }}</p>
+						<p><strong>Emails:</strong> {{ item.email }}</p>
+						<p><strong>Contacts Links</strong> {% if item.found %}{{ item.found }}{% else %}No itmes found{% endif %}</p>
 						</li>
 					{% endfor %}
 				</ul>
+                <h2>Yellow Pages Results</h2>
+                <ul>
+                    {% for item in yellow.searchResult.searchlistings.searchListing %}
+                    <li>
+                    <p><strong>Link:</strong> {{ item }}</p>
+                    <p><strong>Phones:</strong> {{ item.phone }}</p>
+                    <p><strong>Address:</strong> {{ item.street }} {{ item.state }}</p>
+                    </li>
+                    {% endfor %}
+
+                </ul>
 				<p>
 					<form action="{% url 'index' %}" method="post">					
 					    {% csrf_token %}
