@@ -31,11 +31,11 @@
                 <h2>Yellow Pages Results</h2>
                 <ul>
                 	{% if yellowmessage != "" %}
-	                    {% for item in yellow %}
+	                    {% for item2 in yellow %}
 		                    <li>
-		                    <p><strong>Link:</strong> {{ item.websiteURL }}</p>
-		                    <p><strong>Phones:</strong> {{ item.phone }}</p>
-		                    <p><strong>Address:</strong> {{ item.street }} {{ item.state }}</p>
+		                    <p><strong>Link:</strong> {{ item2.websiteURL }}</p>
+		                    <p><strong>Phones:</strong> {{ item2.phone }}</p>
+		                    <p><strong>Address:</strong> {{ item2.street }} {{ item.state }}</p>
 		                    </li>
 	                    {% endfor %}
                     {% else %}
