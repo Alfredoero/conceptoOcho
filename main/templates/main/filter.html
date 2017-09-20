@@ -30,9 +30,9 @@
 				</ul>
                 <h2>Yellow Pages Results</h2>
                 <ul>
-                    {% for item in yellow.searchResult.searchlistings.searchListing %}
+                    {% for item in yellow %}
                     <li>
-                    <p><strong>Link:</strong> {{ item }}</p>
+                    <p><strong>Link:</strong> {{ item.websiteURL }}</p>
                     <p><strong>Phones:</strong> {{ item.phone }}</p>
                     <p><strong>Address:</strong> {{ item.street }} {{ item.state }}</p>
                     </li>

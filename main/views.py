@@ -159,7 +159,7 @@ def get_info(url):
 
 
 def yellowsearch(search, city):
-	yellow_search = requests.get('http://api2.yp.com/listings/v1/search?searchloc=%s&term=%s&format=json&sort=name&radius=5&listingcount=25&key=5t4k08tttp' %(city, search))
+	yellow_search = requests.get('http://api2.yp.com/listings/v1/search?searchloc=%s&term=%s&format=json&sort=name&listingcount=25&key=5t4k08tttp' %(city, search))
 	return yellow_search.json()
 
 
@@ -183,8 +183,8 @@ def filter(request):
 		for page in Search.objects.all():
 			contact.append(get_info(page.site_url))
 		more_search = yellowsearch("%s" % do_search, search_city)
-
-		return render(request, 'main/filter.html', {'contact': contact, "yellow": more_search})
+		yellow = more_search.searchResult.searchListings.searchListing
+		return render(request, 'main/filter.html', {'contact': contact, "yellow": yellow})
 	else:
 		form = PostForm()
 		return render(request, 'main/index.html', {'form': form})
