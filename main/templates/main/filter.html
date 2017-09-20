@@ -31,10 +31,12 @@
                 <h2>Yellow Pages Results</h2>
                 <ul>
                 	
-                    {% for item2 in yellow %}
+                    {% for item2 in yellow %}                    
 	                    <li>
+	                    <p><strong>Name:</strong> {{ item2.businessName }}</p>
 	                    <p><strong>website URL:</strong> {{ item2.websiteURL }}</p>
 	                    <p><strong>Phone:</strong> {{ item2.phone }}</p>
+	                    <p><strong>Email:</strong> {{ item2.email }}</p>
 	                    <p><strong>Address:</strong> {{ item2.street }} {{ item2.state }}</p>
 	                    </li>
                     {% empty %}
