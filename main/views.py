@@ -131,24 +131,30 @@ def get_info(url):
 		new_url = "%s//%s" % (splited_url[0], splited_url[2])
 		contacto = get_links(new_url)
 		if contacto["error"] == "":
-			for cont in list(set(contacto['links'])):
-				if "http" in cont:
-					url_contact = cont
-				else:
-					if "/" in cont:
-						url_contact = "%s%s" % (new_url, cont)
+			if len(contacto["links"]) > 0:
+				for cont in list(set(contacto['links'])):
+					if "http" in cont:
+						url_contact = cont
 					else:
-						url_contact = "%s/%s" % (new_url, cont)
+						if "/" in cont:
+							url_contact = "%s%s" % (new_url, cont)
+						else:
+							url_contact = "%s/%s" % (new_url, cont)
 
-				if valid_url(url_contact):
-					html_doc = urllib.request.urlopen(url_contact)
-					soup = BeautifulSoup(html_doc, 'html.parser')
-					info = soup.findAll(text=re.compile('^(?:(?:\+?1\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])\s*\)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?$'))
-					email = soup.findAll(text=re.compile('(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'))
-					return {"url": contacto["url"], "info": info, 'email': email, "found": url_contact}
-				else:
-					return {"url": contacto["links"], "info": "No Valid URL on links %s" % url_contact, "email": "No Valid URL on links %s" % url_contact}
-
+					if valid_url(url_contact):
+						html_doc = urllib.request.urlopen(url_contact)
+						soup = BeautifulSoup(html_doc, 'html.parser')
+						info = soup.findAll(text=re.compile('^(?:(?:\+?1\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])\s*\)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?$'))
+						email = soup.findAll(text=re.compile('(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'))
+						return {"url": contacto["url"], "info": info, 'email': email, "found": url_contact}
+					else:
+						return {"url": contacto["links"], "info": "No Valid URL on links %s" % url_contact, "email": "No Valid URL on links %s" % url_contact}
+			else:
+				html_doc = urllib.request.urlopen(new_url)
+				soup = BeautifulSoup(html_doc, 'html.parser')
+				info = soup.findAll(text=re.compile('^(?:(?:\+?1\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])\s*\)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?$'))
+				email = soup.findAll(text=re.compile('(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'))
+				return {"url": contacto["url"], "info": info, 'email': email, "found": "No Contact URLs found"}
 		else:
 			return {"url": contacto["url"], "info": "Error %s" % contacto["error"], 'email': "Error %s" % contacto["error"]}
 	except urllib.request.HTTPError as error:
@@ -183,8 +189,10 @@ def filter(request):
 		for page in Search.objects.all():
 			contact.append(get_info(page.site_url))
 		more_search = yellowsearch("%s" % do_search, search_city)
-		if more_search.meta:
-		yellow = more_search["searchResult"]["searchListings"]["searchListing"]
+		if more_search["searchResult"]["metaProperties"]["message"] != "":
+			yellow = more_search["searchResult"]["searchListings"]["searchListing"]
+		else:
+			yellow = []
 		return render(request, 'main/filter.html', {'contact': contact, "yellow": yellow, "yellowmessage": more_search["searchResult"]["metaProperties"]["message"]})
 	else:
 		form = PostForm()

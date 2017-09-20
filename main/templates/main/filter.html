@@ -30,13 +30,19 @@
 				</ul>
                 <h2>Yellow Pages Results</h2>
                 <ul>
-                    {% for item in yellow %}
-                    <li>
-                    <p><strong>Link:</strong> {{ item.websiteURL }}</p>
-                    <p><strong>Phones:</strong> {{ item.phone }}</p>
-                    <p><strong>Address:</strong> {{ item.street }} {{ item.state }}</p>
-                    </li>
-                    {% endfor %}
+                	{% if yellowmessage != "" %}
+	                    {% for item in yellow %}
+		                    <li>
+		                    <p><strong>Link:</strong> {{ item.websiteURL }}</p>
+		                    <p><strong>Phones:</strong> {{ item.phone }}</p>
+		                    <p><strong>Address:</strong> {{ item.street }} {{ item.state }}</p>
+		                    </li>
+	                    {% endfor %}
+                    {% else %}
+	                    <li>
+	                    <p>{{ yellowmessage }}</p>
+	                    </li>
+                    {% endif %}
 
                 </ul>
 				<p>
