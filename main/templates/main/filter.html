@@ -30,17 +30,16 @@
 				</ul>
                 <h2>Yellow Pages Results</h2>
                 <ul>
-                	{% if yellowmessage != "" %}
-	                    {% for item2 in yellow %}
-		                    <li>
-		                    <p><strong>item:</strong> {{ item2 }}</p>
-		                    </li>
-	                    {% endfor %}
-                    {% else %}
+                	
+                    {% for item2 in yellow %}
 	                    <li>
-	                    <p>{{ yellowmessage }}</p>
+	                    <p><strong>item:</strong> {{ item2 }}</p>
 	                    </li>
-                    {% endif %}
+                    {% empty %}
+	                    <li>
+	                    <p><strong>Message: </strong>{{ yellowmessage }}</p>
+	                    </li>
+                    {% endfor %}
 
                 </ul>
 				<p>
