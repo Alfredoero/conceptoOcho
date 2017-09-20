@@ -33,9 +33,7 @@
                 	{% if yellowmessage != "" %}
 	                    {% for item2 in yellow %}
 		                    <li>
-		                    <p><strong>Link:</strong> {{ item2.forloop.counter0.websiteURL }}</p>
-		                    <p><strong>Phones:</strong> {{ item2.counter0.phone }}</p>
-		                    <p><strong>Address:</strong> {{ item2.counter0.street }} {{ item.state }}</p>
+		                    <p><strong>item:</strong> {{ item2 }}</p>
 		                    </li>
 	                    {% endfor %}
                     {% else %}
