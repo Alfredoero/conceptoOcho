@@ -33,7 +33,9 @@
                 	
                     {% for item2 in yellow %}
 	                    <li>
-	                    <p><strong>item:</strong> {{ item2 }}</p>
+	                    <p><strong>website URL:</strong> {{ item2.websiteURL }}</p>
+	                    <p><strong>Phone:</strong> {{ item2.phone }}</p>
+	                    <p><strong>Address:</strong> {{ item2.street }} {{ item2.state }}</p>
 	                    </li>
                     {% empty %}
 	                    <li>
