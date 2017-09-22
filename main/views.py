@@ -11,6 +11,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
+from googleplaces import GooglePlaces, GooglePlacesError
 import requests
 import pprint
 import json
@@ -171,6 +172,16 @@ def get_info(url):
 def yellowsearch(search, city):
 	yellow_search = requests.get('http://api2.yp.com/listings/v1/search?searchloc=%s&term=%s&format=json&sort=name&listingcount=20&key=5t4k08tttp' %(city, search))
 	return yellow_search.json()
+
+
+def placesearch(search, city):
+	sch = search.replace(' ', '+')
+	cty = city.replace(' ', '+')
+	url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=%s+in+%s&key=AIzaSyCCw6wXXZqy0XpYQi17xjU66yhoto1XiVw" % (sch, cty)
+	google_places = requests.get(url)
+	search = google_places.json()
+
+	return search
 
 
 def filter(request):
