@@ -29,8 +29,7 @@
 					{% endfor %}
 				</ul>
                 <h2>Yellow Pages Results</h2>
-                <ul>
-                	
+                <ul>                	
                     {% for item2 in yellow %}                    
 	                    <li>
 	                    <p><strong>Name:</strong> {{ item2.businessName }}</p>
@@ -44,8 +43,20 @@
 	                    <p><strong>Message: </strong>{{ yellowmessage }}</p>
 	                    </li>
                     {% endfor %}
-
                 </ul>
+				<h2>Places Results</h2>
+				<ul>
+					{% for place in places %}
+						<li>
+							<p><strong>Name: </strong> {{ place.name }}</p>
+							<p><strong>Address: </strong> {{ place.address }}</p>
+							<p><strong>Phone number: </strong> {{ place.number }}</p>
+							<p><strong>Site: </strong> {{ place.url }}</p>
+						</li>
+					{% empty %}
+						<li>No places found</li>
+					{% endfor %}
+				</ul>
 				<p>
 					<form action="{% url 'index' %}" method="post">					
 					    {% csrf_token %}

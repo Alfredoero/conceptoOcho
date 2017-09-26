@@ -22,8 +22,8 @@
 	<div class="row">
 		<div class="col-12">			
 			<div id="results">
-				<h1>Custom Search</h1>
-				<div>
+				<h1>Custom Search <span class="loading"><img src="{% static 'assets/Magnify.gif' %}" alt=""></span></h1>
+				<div>					
 					<form action="{% url 'check' %}" method="post">
 					    {% csrf_token %}
 					    {{ form|bootstrap }}
@@ -50,40 +50,11 @@
 	{% endif %}
 	
 </div>
+<script type="text/javascript">
+	$(document).ready(function(){
+		$(".loading").hide();
+	});
+	
+</script>
 </body>
 </html>
-<!--
-<table>
-	<tr>
-		<th>kind</th>
-		<th>title</th>
-		<th>displayLink</th>
-		<th>htmlTitle</th>
-		<th>formattedUrl</th>
-		<th>htmlFormattedUrl</th>
-		<th>pagemap</th>
-		<th>snippet</th>
-		<th>htmlSnippet</th>
-		<th>link</th>
-		<th>cacheId</th>
-	</tr>
-	{% for item in data.items %}
-	<tr>		
-		<td>{{ item.kind }}</td>
-		<td>{{ item.title }}</td>
-		<td>{{ item.displayLink }}</td>
-		<td>{{ item.htmlTitle }}</td>
-		<td>{{ item.formattedUrl }}</td>
-		<td>{{ item.htmlFormattedUrl }}</td>
-		<td>{{ item.pagemap }}</td>
-		<td>{{ item.snippet }}</td>
-		<td>{{ item.htmlSnippet }}</td>
-		<td>{{ item.link }}</td>
-		<td>{{ item.cacheId }}</td>	
-	</tr>
-	{% endfor %}
-	
-</table>
--->
-
-
