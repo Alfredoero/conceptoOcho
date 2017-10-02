@@ -11,6 +11,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
+#from .tasks import placesearch_task, yellowsearch_task
 import requests
 import pprint
 import json
@@ -145,7 +146,7 @@ def get_info(url):
 						html_doc = urllib.request.urlopen(url_contact)
 						soup = BeautifulSoup(html_doc, 'html.parser')
 						info = soup.findAll(text=re.compile('^(?:(?:\+?1\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])\s*\)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?$'))
-						info += soup.findAll(text=re.compile('(\d{3}[-\.\s]??\d{3}[-\.\s]??\d{4}|\(\d{3}\)\s*\d{3}[-\.\s]??\d{4}|\d{3}[-\.\s]??\d{4})'))
+						#info += soup.findAll(text=re.compile('(\d{3}[-\.\s]??\d{3}[-\.\s]??\d{4}|\(\d{3}\)\s*\d{3}[-\.\s]??\d{4}|\d{3}[-\.\s]??\d{4})'))
 						info_list = [re.sub("[^0-9()-]","", x) for x in info]
 						email = soup.findAll(text=re.compile('(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'))
 						return {"url": contacto["url"], "info": info_list, 'email': email, "found": url_contact}
@@ -155,7 +156,7 @@ def get_info(url):
 				html_doc = urllib.request.urlopen(new_url)
 				soup = BeautifulSoup(html_doc, 'html.parser')
 				info = soup.findAll(text=re.compile('^(?:(?:\+?1\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])\s*\)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?$'))
-				info += soup.findAll(text=re.compile('.*?(\(?\d{3}\D{0,3}\d{3}\D{0,3}\d{4}).*?'))
+				#info += soup.findAll(text=re.compile('.*?(\(?\d{3}\D{0,3}\d{3}\D{0,3}\d{4}).*?'))
 				info_list = [re.sub("[^0-9()-]","", x) for x in info]
 				email = soup.findAll(text=re.compile('(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'))
 				return {"url": contacto["url"], "info": info_list, 'email': email, "found": "No Contact URLs found"}
@@ -167,10 +168,14 @@ def get_info(url):
 		return {"url": new_url, "info": "No Valid URL on contact", "email": "No Valid URL on contact"}
 	return
 
+def yellow_status(request):
+	return None
 
-#def yellowsearch(search, city):
-def yellowsearch(request):
-	yellow_search = requests.get('http://api2.yp.com/listings/v1/search?searchloc=%s&term=%s&format=json&sort=name&listingcount=20&key=5t4k08tttp' %(city, search))
+
+def yellowsearch(search, city):
+#def yellowsearch(request):
+	yellow_search = requests.get('http://api2.yp.com/listings/v1/search?searchloc=%s&term=%s&format=json&sort=name&listingcount=20&key=zpddvzj9cy' %(city, search))
+	#yellow_search = requests.get('http://api2.yp.com/listings/v1/search?searchloc=%s&term=%s&format=json&sort=name&listingcount=20&key=5t4k08tttp' %(city, search))
 	return yellow_search.json()
 
 
@@ -187,8 +192,32 @@ def place_detail(request):
 		return None
 
 
-#def placesearch(search, city):
-def placesearch(request):
+def place_status(request):
+
+	detail_places = []
+	for res in search["results"]:
+		plc_id = res["place_id"]
+		url_detail= "https://maps.googleapis.com/maps/api/place/details/json?placeid=%s&key=AIzaSyCCw6wXXZqy0XpYQi17xjU66yhoto1XiVw" % plc_id
+		google_detail = requests.get(url_detail)
+		sch_detail = google_detail.json()
+		if(sch_detail["status"] == "OK"):
+			try: 
+				address = sch_detail["result"]["formatted_address"]
+				number = sch_detail["result"]["international_phone_number"]
+				name = sch_detail["result"]["name"]
+				url = sch_detail["result"]["website"]
+				detail_places.append({"address": address, "number": number, "name": name, "url": url})
+			except KeyError as e:
+				if e == "website":
+					detail_places.append({"address": address, "number": number, "name": name, "url": "Not found"})
+				elif e == "international_phone_number":
+					detail_places.append({"address": address, "number": "Not found", "name": name, "url": url})
+				
+		# print(res["name"])
+	return detail_places
+	 
+def placesearch(search, city):
+#def placesearch(request):
 	sch = search.replace(' ', '+')
 	cty = city.replace(' ', '+')
 	url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=%s+in+%s&key=AIzaSyCCw6wXXZqy0XpYQi17xjU66yhoto1XiVw" % (sch, cty)
@@ -240,8 +269,9 @@ def filter(request):
 		yellow = []
 		if more_search["searchResult"]["metaProperties"]["message"] == "":
 			yellow = more_search["searchResult"]["searchListings"]["searchListing"]
-		places = placesearch(do_search, search_city)
-		return render(request, 'main/filter.html', {'contact': contact, "yellow": yellow, "yellowmessage": more_search["searchResult"]["metaProperties"]["message"], "places": places})
+		#places = placesearch(do_search, search_city)
+		#return render(request, 'main/filter.html', {'contact': contact})
+		return render(request, 'main/filter.html', {'contact': contact, "yellow": yellow, "yellowmessage": more_search["searchResult"]["metaProperties"]["message"]}) #  , "places": places})
 	else:
 		form = PostForm()
 		return render(request, 'main/index.html', {'form': form})

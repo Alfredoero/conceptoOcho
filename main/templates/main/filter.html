@@ -44,19 +44,19 @@
 	                    </li>
                     {% endfor %}
                 </ul>
-				<h2>Places Results</h2>
+				<!--h2>Places Results</h2>
 				<ul>
-					{% for place in places %}
+					{ #% for place in places %#}
 						<li>
-							<p><strong>Name: </strong> {{ place.name }}</p>
-							<p><strong>Address: </strong> {{ place.address }}</p>
+							<p><strong>Name: </strong> { { place.name }}</p>
+							<p><strong>Address: </strong> { { place.address }}</p>
 							<p><strong>Phone number: </strong> {{ place.number }}</p>
-							<p><strong>Site: </strong> {{ place.url }}</p>
+							<p><strong>Site: </strong> { { place.url }}</p>
 						</li>
-					{% empty %}
+					{ #% empty %#}
 						<li>No places found</li>
-					{% endfor %}
-				</ul>
+					{ #% endfor %#}
+				</ul-->
 				<p>
 					<form action="{% url 'index' %}" method="post">					
 					    {% csrf_token %}
