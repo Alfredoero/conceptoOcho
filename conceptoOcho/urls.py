@@ -21,5 +21,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', views.index, name='index'),    
     url(r'^check/$', views.check, name='check'),   
-    url(r'^filter/$', views.filter, name='filter')
+    url(r'^filter/$', views.filter, name='filter'),   
+    url(r'^places/$', views.placesearch, name='places'),   
+    url(r'^yellow/$', views.yellowsearch, name='yellow')
 ]
