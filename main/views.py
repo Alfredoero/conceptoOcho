@@ -121,7 +121,7 @@ def valid_url(url):
 	try:
 		val(url)
 	except ValidationError as e:
-		return False
+		return False	
 	return True
 
 
@@ -168,7 +168,8 @@ def get_info(url):
 	return
 
 
-def yellowsearch(search, city):
+#def yellowsearch(search, city):
+def yellowsearch(request):
 	yellow_search = requests.get('http://api2.yp.com/listings/v1/search?searchloc=%s&term=%s&format=json&sort=name&listingcount=20&key=5t4k08tttp' %(city, search))
 	return yellow_search.json()
 
@@ -186,7 +187,8 @@ def place_detail(request):
 		return None
 
 
-def placesearch(search, city):
+#def placesearch(search, city):
+def placesearch(request):
 	sch = search.replace(' ', '+')
 	cty = city.replace(' ', '+')
 	url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=%s+in+%s&key=AIzaSyCCw6wXXZqy0XpYQi17xjU66yhoto1XiVw" % (sch, cty)
@@ -243,3 +245,6 @@ def filter(request):
 	else:
 		form = PostForm()
 		return render(request, 'main/index.html', {'form': form})
+
+
+
