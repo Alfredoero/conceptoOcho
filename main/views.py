@@ -171,6 +171,13 @@ def get_info(url):
 def yellow_status(request):
 	return None
 
+def yellow_ajax(request):
+	search = request.GET.get("search_str", None)
+	city = request.GET.get("search_city", None)
+	yellow_search = requests.get('http://api2.yp.com/listings/v1/search?searchloc=%s&term=%s&format=json&sort=name&listingcount=20&key=zpddvzj9cy' %(city, search))
+	#yellow_search = requests.get('http://api2.yp.com/listings/v1/search?searchloc=%s&term=%s&format=json&sort=name&listingcount=20&key=5t4k08tttp' %(city, search))
+	return yellow_search.json()
+
 
 def yellowsearch(search, city):
 #def yellowsearch(request):
@@ -265,13 +272,13 @@ def filter(request):
 				search.save()
 		for page in Search.objects.all():
 			contact.append(get_info(page.site_url))
-		more_search = yellowsearch("%s" % do_search, search_city)
-		yellow = []
-		if more_search["searchResult"]["metaProperties"]["message"] == "":
-			yellow = more_search["searchResult"]["searchListings"]["searchListing"]
+		#more_search = yellowsearch("%s" % do_search, search_city)
+		#yellow = []
+		#if more_search["searchResult"]["metaProperties"]["message"] == "":
+		#	yellow = more_search["searchResult"]["searchListings"]["searchListing"]
 		#places = placesearch(do_search, search_city)
-		#return render(request, 'main/filter.html', {'contact': contact})
-		return render(request, 'main/filter.html', {'contact': contact, "yellow": yellow, "yellowmessage": more_search["searchResult"]["metaProperties"]["message"]}) #  , "places": places})
+		return render(request, 'main/filter.html', {'contact': contact})
+		#return render(request, 'main/filter.html', {'contact': contact, "yellow": yellow, "yellowmessage": more_search["searchResult"]["metaProperties"]["message"]}) #  , "places": places})
 	else:
 		form = PostForm()
 		return render(request, 'main/index.html', {'form': form})

@@ -29,7 +29,7 @@
 					{% endfor %}
 				</ul>
                 <h2>Yellow Pages Results</h2>
-                <ul>                	
+                <ul class="yellow_ul">                	
                     {% for item2 in yellow %}                    
 	                    <li>
 	                    <p><strong>Name:</strong> {{ item2.businessName }}</p>
@@ -63,8 +63,30 @@
 						<input type="submit" value="Atras">
 					</form>
 				</p>
+				<input type="hidden" name="search" id="search" value="{{ search }}">
+				<input type="hidden" name="city" id="city" value="{{ city }}">
 			</div>
 		</div>
 	</div>
+	<script type="text/javascript" charset="utf-8" async defer>
+		$(document).ready(function(){
+			var search_str = $("#search").val();
+			var search_city = $("#city").val();
+			$.ajax({
+		        url: '/ajax_yellow/?search_str='+search_str+'&search_city='+search_city,
+		        data: {
+		          'search_str': search_str,
+		          'search_city': search_city
+		        },
+		        dataType: 'json',
+		        success: function (data) {
+		        	console.log(data);
+		          	if (data) {
+		        		alert("A user with this username already exists.");
+		          	}
+		        }
+	      	});
+		});
+	</script>
 </body>
 </html>
