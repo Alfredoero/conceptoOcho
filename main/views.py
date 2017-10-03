@@ -174,9 +174,14 @@ def yellow_status(request):
 def yellow_ajax(request):
 	search = request.GET.get("search_str", None)
 	city = request.GET.get("search_city", None)
+	yellow = []
 	yellow_search = requests.get('http://api2.yp.com/listings/v1/search?searchloc=%s&term=%s&format=json&sort=name&listingcount=20&key=zpddvzj9cy' %(city, search))
+	res = yellow_search.json()
+	if res["searchResult"]["metaProperties"]["message"] == "":
+		yellow = res["searchResult"]["searchListings"]["searchListing"]
+	
+	return JsonResponse(yellow, safe=False)
 	#yellow_search = requests.get('http://api2.yp.com/listings/v1/search?searchloc=%s&term=%s&format=json&sort=name&listingcount=20&key=5t4k08tttp' %(city, search))
-	return yellow_search.json()
 
 
 def yellowsearch(search, city):
@@ -277,7 +282,7 @@ def filter(request):
 		#if more_search["searchResult"]["metaProperties"]["message"] == "":
 		#	yellow = more_search["searchResult"]["searchListings"]["searchListing"]
 		#places = placesearch(do_search, search_city)
-		return render(request, 'main/filter.html', {'contact': contact})
+		return render(request, 'main/filter.html', {'contact': contact, 'search': do_search, 'city': search_city})
 		#return render(request, 'main/filter.html', {'contact': contact, "yellow": yellow, "yellowmessage": more_search["searchResult"]["metaProperties"]["message"]}) #  , "places": places})
 	else:
 		form = PostForm()
