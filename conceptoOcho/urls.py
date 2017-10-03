@@ -24,5 +24,6 @@ urlpatterns = [
     url(r'^filter/$', views.filter, name='filter'),   
     url(r'^places/$', views.place_status, name='places'),   
     url(r'^yellow/$', views.yellow_status, name='yellow'),   
-    url(r'^ajax_yellow/$', views.yellow_ajax, name='yellow_ajax')
+    url(r'^ajax_yellow/$', views.yellow_ajax, name='yellow_ajax'),
+    url(r'^ajax_filter/$', views.filter_ajax, name='filter_ajax')
 ]

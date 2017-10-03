@@ -7,6 +7,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<title></title>
 	<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+	<link rel="stylesheet" href="{% static 'css/style.css' %}">
 	<script src="{% static 'js/jquery.min.js' %}"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
@@ -14,10 +15,11 @@
 	<script type="text/javascript" src="{% static 'js/main.js' %}"></script>
 </head>
 <body>
+	<div class="loading"></div>
 	<div class="container">
 		<div class="row">
 			<div class="col">
-				<h1>Filter <span class="load-img"><img src="{% static 'assets/Magnify.gif' %}" alt=""></span></h1>
+				<h1>Filter</h1>
 				<div>
 					<form action="{% url 'filter' %}" method="post">
 					    {% csrf_token %}
@@ -41,9 +43,9 @@
 
 <script type="text/javascript">
 	$(document).ready(function(){
-		$(".load-img").hide();
+		$(".loading").hide();
 		$(document).on('submit', function(){
-			$(".load-img").show();
+			$(".loading").show();
 		});
 	});
 	
