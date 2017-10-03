@@ -29,8 +29,9 @@
 					{% endfor %}
 				</ul>
                 <h2>Yellow Pages Results</h2>
-                <ul class="yellow_ul">                	
-                    {% for item2 in yellow %}                    
+                <ul class="yellow_ul">
+                    <li><img src="{% static 'assets/Magnify.gif' %}" class="load-img" alt="Loading"></li>
+                    {% comment %}{% for item2 in yellow %}
 	                    <li>
 	                    <p><strong>Name:</strong> {{ item2.businessName }}</p>
 	                    <p><strong>website URL:</strong> {{ item2.websiteURL }}</p>
@@ -42,7 +43,7 @@
 	                    <li>
 	                    <p><strong>Message: </strong>{{ yellowmessage }}</p>
 	                    </li>
-                    {% endfor %}
+                    {% endfor %}{% endcomment %}
                 </ul>
 				<!--h2>Places Results</h2>
 				<ul>
@@ -80,6 +81,8 @@
 		        },
 		        dataType: 'json',
 		        success: function (data) {
+                    $(".load-img").hide();
+
 		        	console.log(data);
 		          	if (data) {
 		        		alert("A user with this username already exists.");
