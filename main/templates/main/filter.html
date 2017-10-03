@@ -80,12 +80,18 @@
 		          'search_city': search_city
 		        },
 		        dataType: 'json',
-		        success: function (data) {
-                    $(".load-img").hide();
-
-		        	console.log(data);
+		        success: function (data) { 
+		        	var list = $(".yellow_ul");		        	
+		        	//console.log(data);
 		          	if (data) {
-		        		alert("A user with this username already exists.");
+		          		$(".load-img").hide();	
+		          		for(var i=0; i < 20; i++){
+			        		console.log(data[i]);
+			        	}
+		        		//alert("A user with this username already exists.");
+		          	}else {
+		          		$(".load-img").hide();
+		          		list.append("<li>No results</li>");
 		          	}
 		        }
 	      	});
