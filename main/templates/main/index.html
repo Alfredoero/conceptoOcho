@@ -22,7 +22,7 @@
 	<div class="row">
 		<div class="col-12">			
 			<div id="results">
-				<h1>Custom Search <span class="loading"><img src="{% static 'assets/Magnify.gif' %}" alt=""></span></h1>
+				<h1>Custom Search <span class="load-img"><img src="{% static 'assets/Magnify.gif' %}" alt=""></span></h1>
 				<div>					
 					<form action="{% url 'check' %}" method="post">
 					    {% csrf_token %}
@@ -52,25 +52,11 @@
 </div>
 <script type="text/javascript">
 	$(document).ready(function(){
-		$(".loading").hide();
-	 	$("#id_username").change(function () {
-      		var username = $(this).val();
-
-      		$.ajax({
-        		url: '/ajax/validate_username/',
-        		data: {
-          			'username': username
-        		},
-        		dataType: 'json',
-        		success: function (data) {
-		          	if (data.is_taken) {
-		            	alert("A user with this username already exists.");
-		          	}
-        		}
-      		});
-    	});
-	});
-	
+		$(".load-img").hide();
+		$(document).on('submit', function(){
+			$(".load-img").show();
+		});
+	});	
 </script>
 </body>
 </html>

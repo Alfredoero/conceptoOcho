@@ -17,7 +17,7 @@
 	<div class="container">
 		<div class="row">
 			<div class="col">
-				<h1>Filter</h1>
+				<h1>Filter <span class="load-img"><img src="{% static 'assets/Magnify.gif' %}" alt=""></span></h1>
 				<div>
 					<form action="{% url 'filter' %}" method="post">
 					    {% csrf_token %}
@@ -38,7 +38,14 @@
 		</div>
 	</div>
 </body>
+
 <script type="text/javascript">
+	$(document).ready(function(){
+		$(".load-img").hide();
+		$(document).on('submit', function(){
+			$(".load-img").show();
+		});
+	});
 	
 </script>
 </html>
