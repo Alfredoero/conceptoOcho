@@ -127,11 +127,14 @@ def valid_url(url):
 	return True
 
 
-def get_info(url):
+#def get_info(url):
+def get_info(request):
 	try:
+		url = request.GET.get('url')
 		splited_url = url.split("/")
 		new_url = "%s//%s" % (splited_url[0], splited_url[2])
 		contacto = get_links(new_url)
+		info = []
 		if contacto["error"] == "":
 			if len(contacto["links"]) > 0:
 				for cont in list(set(contacto['links'])):
@@ -150,9 +153,11 @@ def get_info(url):
 						#info += soup.findAll(text=re.compile('(\d{3}[-\.\s]??\d{3}[-\.\s]??\d{4}|\(\d{3}\)\s*\d{3}[-\.\s]??\d{4}|\d{3}[-\.\s]??\d{4})'))
 						info_list = [re.sub("[^0-9()-]","", x) for x in info]
 						email = soup.findAll(text=re.compile('(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'))
-						return {"url": contacto["url"], "info": info_list, 'email': email, "found": url_contact}
+						info.append({"url": contacto["url"], "info": info_list, 'email': email, "found": url_contact})
+						return JsonResponse(info, safe=False)
 					else:
-						return {"url": contacto["links"], "info": "No Valid URL on links %s" % url_contact, "email": "No Valid URL on links %s" % url_contact}
+						info.append({"url": contacto["links"], "info": "No Valid URL on links %s" % url_contact, "email": "No Valid URL on links %s" % url_contact})
+						return JsonResponse(info, safe=False)
 			else:
 				html_doc = urllib.request.urlopen(new_url)
 				soup = BeautifulSoup(html_doc, 'html.parser')
@@ -160,13 +165,17 @@ def get_info(url):
 				#info += soup.findAll(text=re.compile('.*?(\(?\d{3}\D{0,3}\d{3}\D{0,3}\d{4}).*?'))
 				info_list = [re.sub("[^0-9()-]","", x) for x in info]
 				email = soup.findAll(text=re.compile('(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'))
-				return {"url": contacto["url"], "info": info_list, 'email': email, "found": "No Contact URLs found"}
+				info.append({"url": contacto["url"], "info": info_list, 'email': email, "found": "No Contact URLs found"})
+				return JsonResponse(info, safe=False)
 		else:
-			return {"url": contacto["url"], "info": "Error %s" % contacto["error"], 'email': "Error %s" % contacto["error"]}
+			info.append({"url": contacto["url"], "info": "Error %s" % contacto["error"], 'email': "Error %s" % contacto["error"]})
+			return JsonResponse(info, safe=False)
 	except urllib.request.HTTPError as error:
-		return {"url": new_url, "info": "No Response from server", "email": "No Response from server"}
+		info.append({"url": new_url, "info": "No Response from server", "email": "No Response from server"})
+		return JsonResponse(info, safe=False)
 	except urllib.request.URLError as UrlError:
-		return {"url": new_url, "info": "No Valid URL on contact", "email": "No Valid URL on contact"}
+		info.append({"url": new_url, "info": "No Valid URL on contact", "email": "No Valid URL on contact"})
+		return JsonResponse(info, safe=False)
 	return
 
 def yellow_status(request):
@@ -281,7 +290,8 @@ def filter_ajax(request):
 			search.save()
 	for page in Search.objects.all():
 		#print("begin getting the info")
-		contact.append(get_info(page.site_url))
+		#contact.append(get_info(page.site_url))
+		contact.append({'url': page.site_url})
 	return JsonResponse(contact, safe=False)
 
 

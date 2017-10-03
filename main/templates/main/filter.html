@@ -55,6 +55,36 @@
 	</div>
 	<script type="text/javascript" charset="utf-8" async defer>
 		$(document).ready(function(){
+			function get_info(list){
+				list = $(".google_ul");
+				for (var i = 0; i < list.length; i++) {
+					item = [];
+					$.ajax({
+				        url: '/ajax_get_info/',
+				        data: {
+				          'url': list[i].url, 
+				        },
+				        dataType: 'json',
+				        success: function (data) { 
+				        	var list = $(".google_ul");
+				          	if (data) {
+				          		item = data[0];
+				          	}else {
+				          		$(".load_google").hide();
+				          		list.append("<li>No results</li>");
+				          	}
+				        },
+				        complete: function function_name(argument) {
+				        	list.append("<li><p><strong>Link:</strong> "+ item.url +"</p>"+
+								"<p><strong>Phones:</strong> "+ item.info +"</p>"+
+								"<p><strong>Emails:</strong> "+ item.email +"</p>"+
+								"<p><strong>Contacts Links</strong> "+ item.found +"</p></li>");
+				        }
+			      	});
+
+				}
+				$(".load_google").hide();
+			}
 			var search_str = $("#search").val();
 			var search_city = $("#city").val();
 			var keys = $("#keys").val();
@@ -72,26 +102,12 @@
 		        },
 		        dataType: 'json',
 		        success: function (data) { 
-		        	var list = $(".google_ul");		        	
-		        	//console.log(data);
-		          	if (data) {
-		          		$(".load_google").hide();
-		          		console.log(data);	
-		          		for(var i=0; i < data.length; i++){
-		          			list.append("<li><p><strong>Link:</strong> "+ data[i].url +"</p>"+
-						"<p><strong>Phones:</strong> "+ data[i].info +"</p>"+
-						"<p><strong>Emails:</strong> "+ data[i].email +"</p>"+
-						"<p><strong>Contacts Links</strong> "+ data[i].found +"</p></li>");
-			        		//console.log(data[i]);
-			        	}
-		        		//alert("A user with this username already exists.");
-		          	}else {
-		          		$(".load_google").hide();
-		          		list.append("<li>No results</li>");
-		          	}
-		        }
-	      	});
+		        	var list = data;
+		        	get_info(list);
+		        },
 
+	      	});
+			
 			$.ajax({
 		        url: '/ajax_yellow/',
 		        data: {
