@@ -86,7 +86,12 @@
 		          	if (data) {
 		          		$(".load-img").hide();	
 		          		for(var i=0; i < 20; i++){
-			        		console.log(data[i]);
+		          			list.append("<p><strong>Name:</strong> "+data[i].businessName+"</p>"+
+	                    	"<p><strong>website URL:</strong> "+data[i].websiteURL+"</p>"+
+	                    	"<p><strong>Phone:</strong> "+ data[i].phone +"</p>"+
+	                    	"<p><strong>Email:</strong> "+ data[i].email +"</p>"+
+	                    	"<p><strong>Address:</strong> "+ data[i].street +", "+ data[i].state +"</p>");
+			        		//console.log(data[i]);
 			        	}
 		        		//alert("A user with this username already exists.");
 		          	}else {

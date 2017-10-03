@@ -258,6 +258,26 @@ def placesearch(search, city):
 	return detail_places
 
 
+def filter_ajax(request):
+	keys = request.GET.getlist('keys')
+	do_search = request.GET.get('do_search')
+	search_city = request.GET.get('search_city')
+	search_country = request.GET.get('search_country')
+	language = request.GET.get('language')
+	keys_string = ' '.join(keys)
+	service = build("customsearch", "v1", developerKey="AIzaSyBfsEcEcNt4wtZq7iM5LV2gWfwnSQAD0cA")
+	res = service.cse().list(q="%s %s -filetype:pdf" % (do_search, keys_string), cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language,  filter="1", ).execute()
+	contact = []
+	for item in res["items"]:
+		try:
+			search = Search.objects.get(site_url=item["link"])
+		except Search.DoesNotExist as e:
+			search = Search(site_name=item["title"], site_url=item["link"])
+			search.save()
+	for page in Search.objects.all():
+		contact.append(get_info(page.site_url))
+	return JsonResponse(contact, safe=False)
+
 def filter(request):
 	if request.method == 'POST':
 		keys = request.POST.getlist('keys')
