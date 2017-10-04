@@ -56,32 +56,41 @@
 	<script type="text/javascript" charset="utf-8" async defer>
 		$(document).ready(function(){
 			function get_info(list){
-				list = $(".google_ul");
+				google_ul = $(".google_ul");
 				for (var i = 0; i < list.length; i++) {
 					item = [];
-					$.ajax({
-				        url: '/ajax_get_info/',
-				        data: {
-				          'url': list[i].url, 
-				        },
-				        dataType: 'json',
-				        success: function (data) { 
-				        	var list = $(".google_ul");
-				          	if (data) {
-				          		item = data[0];
-				          	}else {
-				          		$(".load_google").hide();
-				          		list.append("<li>No results</li>");
-				          	}
-				        },
-				        complete: function function_name(argument) {
-				        	list.append("<li><p><strong>Link:</strong> "+ item.url +"</p>"+
-								"<p><strong>Phones:</strong> "+ item.info +"</p>"+
-								"<p><strong>Emails:</strong> "+ item.email +"</p>"+
-								"<p><strong>Contacts Links</strong> "+ item.found +"</p></li>");
-				        }
-			      	});
-
+					console.log(item.length);
+					if(list.length > 0){
+						$.ajax({
+					        url: '/ajax_get_info/',
+					        data: {
+					          'url': list[i].url, 
+					        },
+					        dataType: 'json',
+					        success: function (data) { 
+					          	if (data) {
+					          		item = data[0];
+					          	}else {
+					          		$(".load_google").hide();
+					          		google_ul.append("<li>No results</li>");
+					          	}
+					        },
+					        complete: function function_name(argument) {
+					        	google_ul.append("<li><p><strong>Link:</strong> "+ item.url +"</p>"+
+									"<p><strong>Phones:</strong> "+ item.info +"</p>"+
+									"<p><strong>Emails:</strong> "+ item.email +"</p>"+
+									"<p><strong>Contacts Links</strong> "+ item.found +"</p></li>");
+					        },
+					        statusCode: {
+					        	500: function() {
+					        		google_ul.append("<li><p><strong>Link:</strong> "+list[i].url+" no responde</p>"+
+									"<p><strong>Phones:</strong> "+ item.info +"</p>"+
+									"<p><strong>Emails:</strong> "+ item.email +"</p>"+
+									"<p><strong>Contacts Links</strong> "+ item.found +"</p></li>");		
+					        	}
+					        }
+				      	});
+					}
 				}
 				$(".load_google").hide();
 			}
@@ -90,7 +99,7 @@
 			var keys = $("#keys").val();
 			var country = $("#country").val();
 			var language = $("#language").val();
-
+			var list = "";
 			$.ajax({
 		        url: '/ajax_filter/',
 		        data: {
@@ -102,9 +111,12 @@
 		        },
 		        dataType: 'json',
 		        success: function (data) { 
-		        	var list = data;
-		        	get_info(list);
+		        	list = data;
+		        	
 		        },
+		        complete: function(){
+		        	get_info(list);
+		        }
 
 	      	});
 			
