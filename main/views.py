@@ -21,6 +21,7 @@ import re
 # Create your views here.
 def index(request):
 	form = PostForm()
+	Search.objects.all().delete()
 	return render(request, 'main/index.html', {'form': form})
 
 
@@ -126,11 +127,14 @@ def valid_url(url):
 	return True
 
 
-def get_info(url):
+#def get_info(url):
+def get_info(request):
 	try:
+		url = request.GET.get('url')
 		splited_url = url.split("/")
 		new_url = "%s//%s" % (splited_url[0], splited_url[2])
 		contacto = get_links(new_url)
+		info = []
 		if contacto["error"] == "":
 			if len(contacto["links"]) > 0:
 				for cont in list(set(contacto['links'])):
@@ -149,9 +153,11 @@ def get_info(url):
 						#info += soup.findAll(text=re.compile('(\d{3}[-\.\s]??\d{3}[-\.\s]??\d{4}|\(\d{3}\)\s*\d{3}[-\.\s]??\d{4}|\d{3}[-\.\s]??\d{4})'))
 						info_list = [re.sub("[^0-9()-]","", x) for x in info]
 						email = soup.findAll(text=re.compile('(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'))
-						return {"url": contacto["url"], "info": info_list, 'email': email, "found": url_contact}
+						info.append({"url": contacto["url"], "info": info_list, 'email': email, "found": url_contact})
+						return JsonResponse(info, safe=False)
 					else:
-						return {"url": contacto["links"], "info": "No Valid URL on links %s" % url_contact, "email": "No Valid URL on links %s" % url_contact}
+						info.append({"url": contacto["links"], "info": "No Valid URL on links %s" % url_contact, "email": "No Valid URL on links %s" % url_contact})
+						return JsonResponse(info, safe=False)
 			else:
 				html_doc = urllib.request.urlopen(new_url)
 				soup = BeautifulSoup(html_doc, 'html.parser')
@@ -159,13 +165,17 @@ def get_info(url):
 				#info += soup.findAll(text=re.compile('.*?(\(?\d{3}\D{0,3}\d{3}\D{0,3}\d{4}).*?'))
 				info_list = [re.sub("[^0-9()-]","", x) for x in info]
 				email = soup.findAll(text=re.compile('(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'))
-				return {"url": contacto["url"], "info": info_list, 'email': email, "found": "No Contact URLs found"}
+				info.append({"url": contacto["url"], "info": info_list, 'email': email, "found": "No Contact URLs found"})
+				return JsonResponse(info, safe=False)
 		else:
-			return {"url": contacto["url"], "info": "Error %s" % contacto["error"], 'email': "Error %s" % contacto["error"]}
+			info.append({"url": contacto["url"], "info": "Error %s" % contacto["error"], 'email': "Error %s" % contacto["error"]})
+			return JsonResponse(info, safe=False)
 	except urllib.request.HTTPError as error:
-		return {"url": new_url, "info": "No Response from server", "email": "No Response from server"}
+		info.append({"url": new_url, "info": "No Response from server", "email": "No Response from server"})
+		return JsonResponse(info, safe=False)
 	except urllib.request.URLError as UrlError:
-		return {"url": new_url, "info": "No Valid URL on contact", "email": "No Valid URL on contact"}
+		info.append({"url": new_url, "info": "No Valid URL on contact", "email": "No Valid URL on contact"})
+		return JsonResponse(info, safe=False)
 	return
 
 def yellow_status(request):
@@ -258,6 +268,33 @@ def placesearch(search, city):
 	return detail_places
 
 
+def filter_ajax(request):
+	keys = request.GET.get('keys', None)
+	keys_list = keys.split(",")
+	do_search = request.GET.get('search_str', None)
+	search_city = request.GET.get('search_city', None)
+	search_country = request.GET.get('search_country', None)
+	language = request.GET.get('language', None)		
+	keys_string = ' '.join(keys_list)
+	#print(keys_string, do_search, search_city, language)
+	service = build("customsearch", "v1", developerKey="AIzaSyBfsEcEcNt4wtZq7iM5LV2gWfwnSQAD0cA")
+	res = service.cse().list(q="%s %s -filetype:pdf" % (do_search, keys_string), cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language,  filter="1", ).execute()
+	contact = []
+	#print("pass request GCS")
+	for item in res["items"]:
+		#print(item["link"])
+		try:
+			search = Search.objects.get(site_url=item["link"])
+		except Search.DoesNotExist as e:
+			search = Search(site_name=item["title"], site_url=item["link"])
+			search.save()
+	for page in Search.objects.all():
+		#print("begin getting the info")
+		#contact.append(get_info(page.site_url))
+		contact.append({'url': page.site_url})
+	return JsonResponse(contact, safe=False)
+
+
 def filter(request):
 	if request.method == 'POST':
 		keys = request.POST.getlist('keys')
@@ -265,24 +302,31 @@ def filter(request):
 		search_city = request.POST.get('search_city')
 		search_country = request.POST.get('search_country')
 		language = request.POST.get('language')
-		keys_string = ' '.join(keys)
-		service = build("customsearch", "v1", developerKey="AIzaSyBfsEcEcNt4wtZq7iM5LV2gWfwnSQAD0cA")
-		res = service.cse().list(q="%s %s -filetype:pdf" % (do_search, keys_string), cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language,  filter="1", ).execute()
-		contact = []
-		for item in res["items"]:
-			try:
-				search = Search.objects.get(site_url=item["link"])
-			except Search.DoesNotExist as e:
-				search = Search(site_name=item["title"], site_url=item["link"])
-				search.save()
-		for page in Search.objects.all():
-			contact.append(get_info(page.site_url))
+		keys_string = ','.join(keys)
+		#service = build("customsearch", "v1", developerKey="AIzaSyBfsEcEcNt4wtZq7iM5LV2gWfwnSQAD0cA")
+		#res = service.cse().list(q="%s %s -filetype:pdf" % (do_search, keys_string), cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language,  filter="1", ).execute()
+		#contact = []
+		#for item in res["items"]:
+		#	try:
+		#		search = Search.objects.get(site_url=item["link"])
+		#	except Search.DoesNotExist as e:
+		#		search = Search(site_name=item["title"], site_url=item["link"])
+		#		search.save()
+		#for page in Search.objects.all():
+		#	contact.append(get_info(page.site_url))
 		#more_search = yellowsearch("%s" % do_search, search_city)
 		#yellow = []
 		#if more_search["searchResult"]["metaProperties"]["message"] == "":
 		#	yellow = more_search["searchResult"]["searchListings"]["searchListing"]
 		#places = placesearch(do_search, search_city)
-		return render(request, 'main/filter.html', {'contact': contact, 'search': do_search, 'city': search_city})
+		return render(request, 'main/filter.html', 
+			{	#'contact': contact, 
+				'search': do_search, 
+				'city': search_city,
+				'keys': keys,
+				'country': search_country,
+				'language': language
+			})
 		#return render(request, 'main/filter.html', {'contact': contact, "yellow": yellow, "yellowmessage": more_search["searchResult"]["metaProperties"]["message"]}) #  , "places": places})
 	else:
 		form = PostForm()

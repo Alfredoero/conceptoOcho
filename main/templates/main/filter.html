@@ -7,6 +7,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<title></title>
 	<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+	<link rel="stylesheet" href="{% static 'css/style.css' %}">
 	<script src="{% static 'js/jquery.min.js' %}"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
@@ -18,32 +19,12 @@
 		<div class="row">
 			<div class="col">
 				<h1>Google Results</h1>
-				<ul>
-					{% for item in contact %}
-						<li>
-						<p><strong>Link:</strong> {{ item.url }}</p>
-						<p><strong>Phones:</strong> {{ item.info }}</p>
-						<p><strong>Emails:</strong> {{ item.email }}</p>
-						<p><strong>Contacts Links</strong> {% if item.found %}{{ item.found }}{% else %}No itmes found{% endif %}</p>
-						</li>
-					{% endfor %}
+				<ul class="google_ul">
+					<li class="load_google"><span><img src="{% static 'assets/Magnify.gif' %}" class="load-img" alt="Loading"></li>				
 				</ul>
                 <h2>Yellow Pages Results</h2>
                 <ul class="yellow_ul">
-                    <li><img src="{% static 'assets/Magnify.gif' %}" class="load-img" alt="Loading"></li>
-                    {% comment %}{% for item2 in yellow %}
-	                    <li>
-	                    <p><strong>Name:</strong> {{ item2.businessName }}</p>
-	                    <p><strong>website URL:</strong> {{ item2.websiteURL }}</p>
-	                    <p><strong>Phone:</strong> {{ item2.phone }}</p>
-	                    <p><strong>Email:</strong> {{ item2.email }}</p>
-	                    <p><strong>Address:</strong> {{ item2.street }}, {{ item2.state }}</p>
-	                    </li>
-                    {% empty %}
-	                    <li>
-	                    <p><strong>Message: </strong>{{ yellowmessage }}</p>
-	                    </li>
-                    {% endfor %}{% endcomment %}
+                    <li class="load_yellow"><span><img src="{% static 'assets/Magnify.gif' %}" class="load-img" alt="Loading"></span></li>
                 </ul>
 				<!--h2>Places Results</h2>
 				<ul>
@@ -66,13 +47,67 @@
 				</p>
 				<input type="hidden" name="search" id="search" value="{{ search }}">
 				<input type="hidden" name="city" id="city" value="{{ city }}">
+				<input type="hidden" name="keys[]" id="keys" value="{{ keys }}">
+				<input type="hidden" name="country" id="country" value="{{ country }}">
+				<input type="hidden" name="language" id="language" value="{{ language }}">
 			</div>
 		</div>
 	</div>
 	<script type="text/javascript" charset="utf-8" async defer>
 		$(document).ready(function(){
+			function get_info(list){
+				list = $(".google_ul");
+				for (var i = 0; i < list.length; i++) {
+					item = [];
+					$.ajax({
+				        url: '/ajax_get_info/',
+				        data: {
+				          'url': list[i].url, 
+				        },
+				        dataType: 'json',
+				        success: function (data) { 
+				        	var list = $(".google_ul");
+				          	if (data) {
+				          		item = data[0];
+				          	}else {
+				          		$(".load_google").hide();
+				          		list.append("<li>No results</li>");
+				          	}
+				        },
+				        complete: function function_name(argument) {
+				        	list.append("<li><p><strong>Link:</strong> "+ item.url +"</p>"+
+								"<p><strong>Phones:</strong> "+ item.info +"</p>"+
+								"<p><strong>Emails:</strong> "+ item.email +"</p>"+
+								"<p><strong>Contacts Links</strong> "+ item.found +"</p></li>");
+				        }
+			      	});
+
+				}
+				$(".load_google").hide();
+			}
 			var search_str = $("#search").val();
 			var search_city = $("#city").val();
+			var keys = $("#keys").val();
+			var country = $("#country").val();
+			var language = $("#language").val();
+
+			$.ajax({
+		        url: '/ajax_filter/',
+		        data: {
+		          'search_str': search_str,
+		          'search_city': search_city,
+		          'keys': keys,
+		          'search_country': country,
+		          'language': language 
+		        },
+		        dataType: 'json',
+		        success: function (data) { 
+		        	var list = data;
+		        	get_info(list);
+		        },
+
+	      	});
+			
 			$.ajax({
 		        url: '/ajax_yellow/',
 		        data: {
@@ -80,12 +115,23 @@
 		          'search_city': search_city
 		        },
 		        dataType: 'json',
-		        success: function (data) {
-                    $(".load-img").hide();
-
-		        	console.log(data);
+		        success: function (data) { 
+		        	var list = $(".yellow_ul");		        	
+		        	//console.log(data);
 		          	if (data) {
-		        		alert("A user with this username already exists.");
+		          		$(".load_yellow").hide();	
+		          		for(var i=0; i < data.length; i++){
+		          			list.append("<li><p><strong>Name:</strong> "+data[i].businessName+"</p>"+
+	                    	"<p><strong>website URL:</strong> "+data[i].websiteURL+"</p>"+
+	                    	"<p><strong>Phone:</strong> "+ data[i].phone +"</p>"+
+	                    	"<p><strong>Email:</strong> "+ data[i].email +"</p>"+
+	                    	"<p><strong>Address:</strong> "+ data[i].street +", "+ data[i].state +"</p></li>");
+			        		//console.log(data[i]);
+			        	}
+		        		//alert("A user with this username already exists.");
+		          	}else {
+		          		$(".load_yellow").hide();
+		          		list.append("<li>No results</li>");
 		          	}
 		        }
 	      	});
