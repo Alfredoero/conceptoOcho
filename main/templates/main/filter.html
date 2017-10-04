@@ -83,23 +83,20 @@
 					        },
 					        statusCode: {
 					        	500: function() {
-					        		google_ul.append("<li><p><strong>Link:</strong> "+list[i].url+" no responde</p>"+
-									"<p><strong>Phones:</strong> "+ item.info +"</p>"+
-									"<p><strong>Emails:</strong> "+ item.email +"</p>"+
-									"<p><strong>Contacts Links</strong> "+ item.found +"</p></li>");		
+					        		google_ul.append("<li><p><strong>Link:</strong> "+list[i].url+" no responde</p></li>");		
 					        	}
 					        }
 				      	});
 					}
 				}
-				$(".load_google").hide();
+				//$(".load_google").hide();
 			}
 			var search_str = $("#search").val();
 			var search_city = $("#city").val();
 			var keys = $("#keys").val();
 			var country = $("#country").val();
 			var language = $("#language").val();
-			var list = "";
+			var lista = "";
 			$.ajax({
 		        url: '/ajax_filter/',
 		        data: {
@@ -111,11 +108,11 @@
 		        },
 		        dataType: 'json',
 		        success: function (data) { 
-		        	list = data;
+		        	lista = data;
 		        	
 		        },
 		        complete: function(){
-		        	get_info(list);
+		        	get_info(lista);
 		        }
 
 	      	});
