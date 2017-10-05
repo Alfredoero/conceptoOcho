@@ -68,6 +68,7 @@
 						statusCode: {
 							500: function(data){
 								current++;
+								
 								google_ul.append("<li><p>error 500 "+ data +"</p></li>");
 							},
 							503: function(data){								
