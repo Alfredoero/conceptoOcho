@@ -18,10 +18,9 @@
 	<div class="container">
 		<div class="row">
 			<div class="col">
-				<h1>Google Results</h1>
-				<ul class="google_ul">
-					<li class="load_google"><span><img src="{% static 'assets/Magnify.gif' %}" class="load-img" alt="Loading"></li>				
-				</ul>
+				<h1>Google Results <span class="load_google"><img src="{% static 'assets/Magnify.gif' %}" class="load-img" alt="Loading"></span></h1>
+				<ol class="google_ul">
+				</ol>
                 <h2>Yellow Pages Results</h2>
                 <ul class="yellow_ul">
                     <li class="load_yellow"><span><img src="{% static 'assets/Magnify.gif' %}" class="load-img" alt="Loading"></span></li>
@@ -50,46 +49,44 @@
 				<input type="hidden" name="keys[]" id="keys" value="{{ keys }}">
 				<input type="hidden" name="country" id="country" value="{{ country }}">
 				<input type="hidden" name="language" id="language" value="{{ language }}">
+				<input type="hidden" name="totalReq" id="totalReq" value="0">
 			</div>
 		</div>
 	</div>
 	<script type="text/javascript" charset="utf-8" async defer>
 		$(document).ready(function(){
+			var totalReq = 0;
 			function get_info(list){
+				$("#totalReq").val(list.length);
 				google_ul = $(".google_ul");
+				var current = 1;
 				for (var i = 0; i < list.length; i++) {
-					item = [];
-					console.log(item.length);
-					if(list.length > 0){
-						$.ajax({
-					        url: '/ajax_get_info/',
-					        data: {
-					          'url': list[i].url, 
-					        },
-					        dataType: 'json',
-					        success: function (data) { 
-					          	if (data) {
-					          		item = data[0];
-					          	}else {
-					          		$(".load_google").hide();
-					          		google_ul.append("<li>No results</li>");
-					          	}
-					        },
-					        complete: function function_name(argument) {
-					        	google_ul.append("<li><p><strong>Link:</strong> "+ item.url +"</p>"+
-									"<p><strong>Phones:</strong> "+ item.info +"</p>"+
-									"<p><strong>Emails:</strong> "+ item.email +"</p>"+
-									"<p><strong>Contacts Links</strong> "+ item.found +"</p></li>");
-					        },
-					        statusCode: {
-					        	500: function() {
-					        		google_ul.append("<li><p><strong>Link:</strong> "+list[i].url+" no responde</p></li>");		
-					        	}
-					        }
-				      	});
-					}
+					$.when($.ajax({ 
+						url: '/ajax_get_info/', 
+						data: { 'url': list[i].url }, 
+						dataType: 'json',
+						statusCode: {
+							500: function(data){
+								google_ul.append("<li><p>error 500 "+ data +"</p></li>");
+							}
+						}
+					}))
+					.then(function(data, statusText, jqXHR){
+						google_ul.append("<li><p><strong>Link:</strong> "+ data[0].url +"</p>"+
+								"<p><strong>Phones:</strong> "+ data[0].info +"</p>"+
+								"<p><strong>Emails:</strong> "+ data[0].email +"</p>"+
+								"<p><strong>Contacts Links</strong> "+ data[0].found +"</p></li>");
+						var totalReq = $("#totalReq").val();
+						console.log(current + ' ' + totalReq);
+						if(current == totalReq){
+							$(".load_google").hide();
+						}else{
+							current++;
+						}
+					});						
+					
 				}
-				//$(".load_google").hide();
+				//
 			}
 			var search_str = $("#search").val();
 			var search_city = $("#city").val();
@@ -142,6 +139,12 @@
 		          		$(".load_yellow").hide();
 		          		list.append("<li>No results</li>");
 		          	}
+		        },
+		        statusCode: {
+		        	500: function(){
+		        		$(".load_yellow").hide();
+		          		$(".yellow_ul").append("<li>Error 500 (Sin respuesta del server)</li>");	
+		        	}
 		        }
 	      	});
 		});

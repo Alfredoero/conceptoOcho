@@ -115,7 +115,8 @@ def get_links(url):
 		contact += [x for x in links if "CONTACT" in x]
 		return {"url": url, "links": contact, "error": ""}
 	except urllib.request.HTTPError as error:
-		return {"url": url, "links": "No response %s" % url, "error": "No response %s" % url}
+		contact = []
+		return {"url": url, "links": contact , "error": "No response %s" % url}
 
 
 def valid_url(url):
@@ -128,13 +129,13 @@ def valid_url(url):
 
 
 #def get_info(url):
-def get_info(request):
+def get_info(request):	
+	info_all = []
 	try:
 		url = request.GET.get('url')
 		splited_url = url.split("/")
 		new_url = "%s//%s" % (splited_url[0], splited_url[2])
 		contacto = get_links(new_url)
-		info = []
 		if contacto["error"] == "":
 			if len(contacto["links"]) > 0:
 				for cont in list(set(contacto['links'])):
@@ -153,10 +154,10 @@ def get_info(request):
 						#info += soup.findAll(text=re.compile('(\d{3}[-\.\s]??\d{3}[-\.\s]??\d{4}|\(\d{3}\)\s*\d{3}[-\.\s]??\d{4}|\d{3}[-\.\s]??\d{4})'))
 						info_list = [re.sub("[^0-9()-]","", x) for x in info]
 						email = soup.findAll(text=re.compile('(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'))
-						info.append({"url": contacto["url"], "info": info_list, 'email': email, "found": url_contact})
-						return JsonResponse(info, safe=False)
+						info_all.append({"url": contacto["url"], "info": info_list, 'email': email, "found": url_contact})
+						return JsonResponse(info_all, safe=False)
 					else:
-						info.append({"url": contacto["links"], "info": "No Valid URL on links %s" % url_contact, "email": "No Valid URL on links %s" % url_contact})
+						info_all.append({"url": contacto["links"], "info": "No Valid URL on links %s" % url_contact, "email": "No Valid URL on links %s" % url_contact})
 						return JsonResponse(info, safe=False)
 			else:
 				html_doc = urllib.request.urlopen(new_url)
@@ -165,17 +166,17 @@ def get_info(request):
 				#info += soup.findAll(text=re.compile('.*?(\(?\d{3}\D{0,3}\d{3}\D{0,3}\d{4}).*?'))
 				info_list = [re.sub("[^0-9()-]","", x) for x in info]
 				email = soup.findAll(text=re.compile('(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'))
-				info.append({"url": contacto["url"], "info": info_list, 'email': email, "found": "No Contact URLs found"})
-				return JsonResponse(info, safe=False)
+				info_all.append({"url": contacto["url"], "info": info_list, 'email': email, "found": "No Contact URLs found"})
+				return JsonResponse(info_all, safe=False)
 		else:
-			info.append({"url": contacto["url"], "info": "Error %s" % contacto["error"], 'email': "Error %s" % contacto["error"]})
-			return JsonResponse(info, safe=False)
+			info_all.append({"url": contacto["url"], "info": "Error %s" % contacto["error"], 'email': "Error %s" % contacto["error"]})
+			return JsonResponse(info_all, safe=False)
 	except urllib.request.HTTPError as error:
-		info.append({"url": new_url, "info": "No Response from server", "email": "No Response from server"})
-		return JsonResponse(info, safe=False)
+		info_all.append({"url": new_url, "info": "No Response from server", "email": "No Response from server"})
+		return JsonResponse(info_all, safe=False)
 	except urllib.request.URLError as UrlError:
-		info.append({"url": new_url, "info": "No Valid URL on contact", "email": "No Valid URL on contact"})
-		return JsonResponse(info, safe=False)
+		info_all.append({"url": new_url, "info": "No Valid URL on contact", "email": "No Valid URL on contact"})
+		return JsonResponse(info_all, safe=False)
 	return
 
 def yellow_status(request):
@@ -278,7 +279,10 @@ def filter_ajax(request):
 	keys_string = ' '.join(keys_list)
 	#print(keys_string, do_search, search_city, language)
 	service = build("customsearch", "v1", developerKey="AIzaSyBfsEcEcNt4wtZq7iM5LV2gWfwnSQAD0cA")
-	res = service.cse().list(q="%s %s -filetype:pdf" % (do_search, keys_string), cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language,  filter="1", ).execute()
+	if len(keys_list) > 0:
+		res = service.cse().list(q="%s %s -filetype:pdf" % (do_search, keys_string), cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language,  filter="1", ).execute()
+	else:
+		res = service.cse().list(q="%s -filetype:pdf" % do_search, cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language,  filter="1", ).execute()
 	contact = []
 	#print("pass request GCS")
 	for item in res["items"]:
