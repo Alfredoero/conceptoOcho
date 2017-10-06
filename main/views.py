@@ -11,11 +11,15 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
+from xlsxwriter.workbook import Workbook
+from wsgiref.util import FileWrapper
+from conceptoOcho.settings import PROJECT_ROOT
 #from .tasks import placesearch_task, yellowsearch_task
 import requests
 import pprint
 import json
 import re
+import os
 
 
 # Create your views here.
@@ -41,7 +45,6 @@ def check(request):
 				service = build("customsearch", "v1", developerKey="AIzaSyBfsEcEcNt4wtZq7iM5LV2gWfwnSQAD0cA")
 				res = service.cse().list( q="%s -filetype:pdf" % data, cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()
 				total = res["searchInformation"]["totalResults"]
-				# print(res["queries"])
 				all_links = []
 				n_total = []
 				all_metas = []
@@ -59,7 +62,8 @@ def check(request):
 									contenido = met["content"]
 									content_list = contenido.split(",")
 									for key in content_list:
-										keywords.append(key.strip())
+										if(key.strip() != "" and key.strip() != " "):
+											keywords.append(key.strip())
 								except KeyError:
 									pass
 								metas.append(met.encode("utf-8"))
@@ -128,7 +132,6 @@ def valid_url(url):
 	return True
 
 
-#def get_info(url):
 def get_info(request):	
 	info_all = []
 	try:
@@ -179,8 +182,10 @@ def get_info(request):
 		return JsonResponse(info_all, safe=False)
 	return
 
+
 def yellow_status(request):
 	return None
+
 
 def yellow_ajax(request):
 	search = request.GET.get("search_str", None)
@@ -191,12 +196,10 @@ def yellow_ajax(request):
 	if res["searchResult"]["metaProperties"]["message"] == "":
 		yellow = res["searchResult"]["searchListings"]["searchListing"]
 	
-	return JsonResponse(yellow, safe=False)
-	#yellow_search = requests.get('http://api2.yp.com/listings/v1/search?searchloc=%s&term=%s&format=json&sort=name&listingcount=20&key=5t4k08tttp' %(city, search))
+	return JsonResponse(yellow, safe=False)	
 
 
 def yellowsearch(search, city):
-#def yellowsearch(request):
 	yellow_search = requests.get('http://api2.yp.com/listings/v1/search?searchloc=%s&term=%s&format=json&sort=name&listingcount=20&key=zpddvzj9cy' %(city, search))
 	#yellow_search = requests.get('http://api2.yp.com/listings/v1/search?searchloc=%s&term=%s&format=json&sort=name&listingcount=20&key=5t4k08tttp' %(city, search))
 	return yellow_search.json()
@@ -239,8 +242,8 @@ def place_status(request):
 		# print(res["name"])
 	return detail_places
 	 
+
 def placesearch(search, city):
-#def placesearch(request):
 	sch = search.replace(' ', '+')
 	cty = city.replace(' ', '+')
 	url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=%s+in+%s&key=AIzaSyCCw6wXXZqy0XpYQi17xjU66yhoto1XiVw" % (sch, cty)
@@ -265,7 +268,6 @@ def placesearch(search, city):
 				elif e == "international_phone_number":
 					detail_places.append({"address": address, "number": "Not found", "name": name, "url": url})
 				
-		# print(res["name"])
 	return detail_places
 
 
@@ -277,26 +279,44 @@ def filter_ajax(request):
 	search_country = request.GET.get('search_country', None)
 	language = request.GET.get('language', None)		
 	keys_string = ' '.join(keys_list)
-	#print(keys_string, do_search, search_city, language)
 	service = build("customsearch", "v1", developerKey="AIzaSyBfsEcEcNt4wtZq7iM5LV2gWfwnSQAD0cA")
 	if len(keys_list) > 0:
 		res = service.cse().list(q="%s %s -filetype:pdf" % (do_search, keys_string), cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language,  filter="1", ).execute()
 	else:
 		res = service.cse().list(q="%s -filetype:pdf" % do_search, cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language,  filter="1", ).execute()
 	contact = []
-	#print("pass request GCS")
 	for item in res["items"]:
-		#print(item["link"])
 		try:
 			search = Search.objects.get(site_url=item["link"])
 		except Search.DoesNotExist as e:
 			search = Search(site_name=item["title"], site_url=item["link"])
 			search.save()
 	for page in Search.objects.all():
-		#print("begin getting the info")
-		#contact.append(get_info(page.site_url))
 		contact.append({'url': page.site_url})
 	return JsonResponse(contact, safe=False)
+
+
+def make_excel(request):
+	PATH_FULL = os.path.dirname(os.path.abspath(__file__))
+	file_path = os.path.join(PATH_FULL,'assets/name.xlsx')
+	workbook = Workbook(file_path)
+	worksheet = workbook.add_worksheet()
+	worksheet.write('A1', "Zup nigga")
+	worksheet.write('A2', "Zup Bro")
+	workbook.close()
+	data = {'status': "ok", "file_name": "name.xlsx"}
+	return JsonResponse(data, safe=False)
+
+
+def excel_download(request, filename):
+	PATH_FULL = os.path.dirname(os.path.abspath(__file__))
+	path = os.path.join(PATH_FULL, 'assets')
+	print(filename)
+	f = open(path+"/name.xlsx", "r")
+	response = HttpResponse(FileWrapper(f), content_type='text/csv')
+	response['Content-Disposition'] = 'attachment; filename=excel.xlsx'
+	f.close()
+	return response
 
 
 def filter(request):
@@ -307,31 +327,13 @@ def filter(request):
 		search_country = request.POST.get('search_country')
 		language = request.POST.get('language')
 		keys_string = ','.join(keys)
-		#service = build("customsearch", "v1", developerKey="AIzaSyBfsEcEcNt4wtZq7iM5LV2gWfwnSQAD0cA")
-		#res = service.cse().list(q="%s %s -filetype:pdf" % (do_search, keys_string), cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language,  filter="1", ).execute()
-		#contact = []
-		#for item in res["items"]:
-		#	try:
-		#		search = Search.objects.get(site_url=item["link"])
-		#	except Search.DoesNotExist as e:
-		#		search = Search(site_name=item["title"], site_url=item["link"])
-		#		search.save()
-		#for page in Search.objects.all():
-		#	contact.append(get_info(page.site_url))
-		#more_search = yellowsearch("%s" % do_search, search_city)
-		#yellow = []
-		#if more_search["searchResult"]["metaProperties"]["message"] == "":
-		#	yellow = more_search["searchResult"]["searchListings"]["searchListing"]
-		#places = placesearch(do_search, search_city)
 		return render(request, 'main/filter.html', 
-			{	#'contact': contact, 
-				'search': do_search, 
+			{	'search': do_search, 
 				'city': search_city,
 				'keys': keys,
 				'country': search_country,
 				'language': language
 			})
-		#return render(request, 'main/filter.html', {'contact': contact, "yellow": yellow, "yellowmessage": more_search["searchResult"]["metaProperties"]["message"]}) #  , "places": places})
 	else:
 		form = PostForm()
 		return render(request, 'main/index.html', {'form': form})

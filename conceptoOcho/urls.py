@@ -26,5 +26,7 @@ urlpatterns = [
     url(r'^yellow/$', views.yellow_status, name='yellow'),   
     url(r'^ajax_yellow/$', views.yellow_ajax, name='yellow_ajax'),
     url(r'^ajax_filter/$', views.filter_ajax, name='filter_ajax'),
-    url(r'^ajax_get_info/$', views.get_info, name='get_info_ajax')
+    url(r'^ajax_get_info/$', views.get_info, name='get_info_ajax'),
+    url(r'^ajax_excel/$', views.make_excel, name='excel_ajax'),
+    url(r'^files/(?P<filename>)', views.excel_download),
 ]

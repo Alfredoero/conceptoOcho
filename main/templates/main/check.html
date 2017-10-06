@@ -19,13 +19,17 @@
 	<div class="container">
 		<div class="row">
 			<div class="col">
-				<h1>Filter</h1>
+				<h1>Filter <a class="btn button" href="{% url 'index' %}">Atras</a></h1>
 				<div>
 					<form action="{% url 'filter' %}" method="post">
-					    {% csrf_token %}
+					    {% csrf_token %}						
 					    {% for key in data %}
-						<div class="checkbox">
+					    <div class="checkbox">
 						  	<label><input type="checkbox" name="keys[]" value="{{ key }}">{{ key }}</label>
+						</div>
+						{% empty %}
+						<div class="checkbox">
+							<label >No Keywords found</label>
 						</div>
 						{% endfor %}
 						<input type="hidden" name="do_search" value="{{ do_search }}"/>

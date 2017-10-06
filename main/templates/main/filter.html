@@ -43,6 +43,9 @@
 					    {% csrf_token %}
 						<input type="submit" value="Atras">
 					</form>
+					<div class="excel_link">
+						<a href="" class="excel" target="_blank">Excel</a>						
+					</div>
 				</p>
 				<input type="hidden" name="search" id="search" value="{{ search }}">
 				<input type="hidden" name="city" id="city" value="{{ city }}">
@@ -56,6 +59,7 @@
 	<script type="text/javascript" charset="utf-8" async defer>
 		$(document).ready(function(){
 			var totalReq = 0;
+			$(".excel_link").hide();
 			function get_info(list){
 				$("#totalReq").val(list.length);
 				google_ul = $(".google_ul");
@@ -152,6 +156,13 @@
 		        	}
 		        }
 	      	});
+	      	$.when($.ajax({url: '/ajax_excel/', dataType: 'json'}))
+	      	.then(function(data, statusText, jqXHR){
+	      		var link = "/files/"+data.file_name;
+	      		$(".excel").attr('href', link);
+	      		$(".excel_link").show();
+	      	});
+	      	
 		});
 	</script>
 </body>
