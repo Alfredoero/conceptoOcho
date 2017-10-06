@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 import urllib.request
 from .forms import PostForm
-from .models import Search
+from .models import Search, Keyword, Phone, InfoSearch
 from bs4 import BeautifulSoup
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
@@ -54,6 +55,7 @@ def check(request):
 						all_links.append(item["link"])
 						metas = []
 						soup = ""
+						infoSearch = InfoSearch()
 						try:
 							html_doc = urllib.request.urlopen(item["link"])
 							soup = BeautifulSoup(html_doc, 'html.parser')
@@ -64,10 +66,14 @@ def check(request):
 									for key in content_list:
 										if(key.strip() != "" and key.strip() != " "):
 											keywords.append(key.strip())
+											keyw = Keyword()
+											keyw.keyword = key.strip()
+											keyw.save()
+											infoSearch.keywords.add(keyw)
 								except KeyError:
 									pass
-								metas.append(met.encode("utf-8"))
-
+								metas.append(met.encode("utf-8"))				
+							
 							all_metas.append({"link": item["link"] , "meta": metas})
 						except urllib.request.HTTPError as error:
 							allow = False
@@ -87,8 +93,14 @@ def check(request):
 										total_weight += len(soup.findAll(text=re.compile("%s" % key.upper())))
 										total_weight += len(soup.findAll(text=re.compile("%s" % key.lower())))
 										total_weight += len(soup.findAll(text=re.compile("%s" % key.capitalize())))
-								search.site_weight = total_weight
+								search.site_weight = total_weight								
 							search.save()
+						try:
+							infoS = InfoSearch.objects.get(site_url=item["link"])
+						except InfoSearch.DoesNotExist as e:
+							infoSearch.site_url=item["link"] 
+							infoSearch.site_name=item["title"]
+							infoSearch.save()
 						# for x in xrange(1, 10):
 						#   n_total.append(x)
 						#   res2 = service.cse().list( q=data, cx='011980423541542895616:ug0kbjbf6vm', gl='us', start=(x*10)+1, ).execute()
@@ -301,8 +313,8 @@ def make_excel(request):
 	file_path = os.path.join(PATH_FULL,'assets/unicode_name.xlsx')
 	workbook = Workbook(file_path)
 	worksheet = workbook.add_worksheet()
-	var1 = 'Zup nigga'
-	var2 = 'Zup bro'
+	var1 = u'Zup nigga'
+	var2 = u'Zup bro'
 	worksheet.write('A1', var1)
 	worksheet.write('A2', var2)
 	workbook.close()
@@ -313,11 +325,8 @@ def make_excel(request):
 def excel_download(request):
 	PATH_FULL = os.path.dirname(os.path.abspath(__file__))
 	path = os.path.join(PATH_FULL, 'assets')
-	with open(path+"/unicode_name.xlsx", 'rb') as f:
-		result = chardet.detect(f.read())
-	print(result) 
-	file = open(path+"/unicode_name.xlsx", encoding='utf-8')
-	response = HttpResponse(FileWrapper(file), content_type='text/csv')
+	file = open(os.path.join(path,"unicode_name.xlsx"), 'rb')
+	response = HttpResponse(FileWrapper(file), content_type='application/vnd.ms-excel') 
 	response['Content-Disposition'] = 'attachment; filename=excel.xlsx'
 	f.close()
 	return response
