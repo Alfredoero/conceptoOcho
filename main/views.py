@@ -299,11 +299,13 @@ def filter_ajax(request):
 
 def make_excel(request):
 	PATH_FULL = os.path.dirname(os.path.abspath(__file__))
-	file_path = os.path.join(PATH_FULL,'assets/name.xlsx')
+	file_path = os.path.join(PATH_FULL,'assets/unicode_name.xlsx')
 	workbook = Workbook(file_path)
 	worksheet = workbook.add_worksheet()
-	worksheet.write('A1', "Zup nigga")
-	worksheet.write('A2', "Zup Bro")
+	var1 = 'Zup nigga'
+	var2 = 'Zup bro'
+	worksheet.write('A1', var1)
+	worksheet.write('A2', var2)
 	workbook.close()
 	data = {'status': "ok", "file_name": "name.xlsx"}
 	return JsonResponse(data, safe=False)
@@ -312,10 +314,10 @@ def make_excel(request):
 def excel_download(request):
 	PATH_FULL = os.path.dirname(os.path.abspath(__file__))
 	path = os.path.join(PATH_FULL, 'assets')
-	with open(path+"/name.xlsx", 'rb') as f:
+	with open(path+"/unicode_name.xlsx", 'rb') as f:
 		result = chardet.detect(f.read())
 	print(result) 
-	file = open(path+"/name.xlsx", encoding=result['encoding'])
+	file = open(path+"/unicode_name.xlsx", )
 	response = HttpResponse(FileWrapper(file), content_type='text/csv')
 	response['Content-Disposition'] = 'attachment; filename=excel.xlsx'
 	f.close()
