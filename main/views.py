@@ -16,6 +16,7 @@ from wsgiref.util import FileWrapper
 from conceptoOcho.settings import PROJECT_ROOT
 #from .tasks import placesearch_task, yellowsearch_task
 import requests
+import chardet
 import pprint
 import json
 import re
@@ -308,12 +309,14 @@ def make_excel(request):
 	return JsonResponse(data, safe=False)
 
 
-def excel_download(request, filename):
+def excel_download(request):
 	PATH_FULL = os.path.dirname(os.path.abspath(__file__))
 	path = os.path.join(PATH_FULL, 'assets')
-	print(filename)
-	f = open(path+"/name.xlsx", "r")
-	response = HttpResponse(FileWrapper(f), content_type='text/csv')
+	with open(path+"/name.xlsx", 'rb') as f:
+		result = chardet.detect(f.read())
+	print(result) 
+	file = open(path+"/name.xlsx", encoding=result['encoding'])
+	response = HttpResponse(FileWrapper(file), content_type='text/csv')
 	response['Content-Disposition'] = 'attachment; filename=excel.xlsx'
 	f.close()
 	return response

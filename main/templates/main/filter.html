@@ -44,7 +44,7 @@
 						<input type="submit" value="Atras">
 					</form>
 					<div class="excel_link">
-						<a href="" class="excel" target="_blank">Excel</a>						
+						<a href="{% url 'excel_download' %} " class="excel" target="_blank">Excel</a>						
 					</div>
 				</p>
 				<input type="hidden" name="search" id="search" value="{{ search }}">
@@ -159,7 +159,7 @@
 	      	$.when($.ajax({url: '/ajax_excel/', dataType: 'json'}))
 	      	.then(function(data, statusText, jqXHR){
 	      		var link = "/files/"+data.file_name;
-	      		$(".excel").attr('href', link);
+	      		//$(".excel").attr('href', link);
 	      		$(".excel_link").show();
 	      	});
 	      	
