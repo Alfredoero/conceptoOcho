@@ -317,7 +317,7 @@ def excel_download(request):
 	with open(path+"/unicode_name.xlsx", 'rb') as f:
 		result = chardet.detect(f.read())
 	print(result) 
-	file = open(path+"/unicode_name.xlsx", )
+	file = open(path+"/unicode_name.xlsx", encoding='utf-8')
 	response = HttpResponse(FileWrapper(file), content_type='text/csv')
 	response['Content-Disposition'] = 'attachment; filename=excel.xlsx'
 	f.close()
