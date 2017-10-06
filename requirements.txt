@@ -4,7 +4,6 @@ chardet==3.0.4
 dj-database-url==0.4.2
 Django==1.11.5
 django-bootstrap-form==3.3
-get==0.0.0
 gevent==1.2.2
 google-api-python-client==1.6.3
 greenlet==0.4.12
