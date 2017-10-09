@@ -5,12 +5,13 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 import urllib.request
 from .forms import PostForm
-from .models import Search, Keyword, Phone, InfoSearch
+from .models import Search, Keyword, Phone, InfoSearch, InfoYellow
 from bs4 import BeautifulSoup
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
+from django.db import IntegrityError
 from xlsxwriter.workbook import Workbook
 from wsgiref.util import FileWrapper
 from conceptoOcho.settings import PROJECT_ROOT
@@ -30,6 +31,7 @@ def index(request):
 	return render(request, 'main/index.html', {'form': form})
 
 
+# in use
 def check(request):
 	page = 0
 	if request.method == 'POST':
@@ -44,40 +46,38 @@ def check(request):
 			page = request.POST.get("page")
 			try:
 				service = build("customsearch", "v1", developerKey="AIzaSyBfsEcEcNt4wtZq7iM5LV2gWfwnSQAD0cA")
-				res = service.cse().list( q="%s -filetype:pdf" % data, cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()
-				total = res["searchInformation"]["totalResults"]
+				res = service.cse().list(q="%s -filetype:pdf" % data, cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()
 				all_links = []
-				n_total = []
-				all_metas = []
-				try:
-					for item in res["items"]:
+
+				for item in res["items"]:
+					try:
 						allow = True
 						all_links.append(item["link"])
 						metas = []
 						soup = ""
-						infoSearch = InfoSearch()
+						infoSearch = InfoSearch(site_url=item["link"])
 						try:
 							html_doc = urllib.request.urlopen(item["link"])
 							soup = BeautifulSoup(html_doc, 'html.parser')
-							for met in soup.findAll(attrs={"name":"keywords"}):
+							for met in soup.findAll(attrs={"name": "keywords"}):
 								try:
 									contenido = met["content"]
 									content_list = contenido.split(",")
 									for key in content_list:
-										if(key.strip() != "" and key.strip() != " "):
+										if key.strip() != "" and key.strip() != " ":
 											keywords.append(key.strip())
-											keyw = Keyword()
-											keyw.keyword = key.strip()
-											keyw.save()
-											infoSearch.keywords.add(keyw)
+											metas.append(key.strip())
+											try:
+												keyw = Keyword.objects.get(keyword=key.strip())
+											except Keyword.DoesNotExist:
+												keyw = Keyword()
+												keyw.keyword = key.strip()
+												keyw.save()
 								except KeyError:
 									pass
-								metas.append(met.encode("utf-8"))				
-							
-							all_metas.append({"link": item["link"] , "meta": metas})
+
 						except urllib.request.HTTPError as error:
 							allow = False
-							all_metas.append({"link": item["link"] , "meta": "Forbidden %s" % error.code})
 						except urllib.request.URLError as error:
 							allow = False
 						try:
@@ -93,14 +93,13 @@ def check(request):
 										total_weight += len(soup.findAll(text=re.compile("%s" % key.upper())))
 										total_weight += len(soup.findAll(text=re.compile("%s" % key.lower())))
 										total_weight += len(soup.findAll(text=re.compile("%s" % key.capitalize())))
-								search.site_weight = total_weight								
+								search.site_weight = total_weight
 							search.save()
-						try:
-							infoS = InfoSearch.objects.get(site_url=item["link"])
-						except InfoSearch.DoesNotExist as e:
-							infoSearch.site_url=item["link"] 
-							infoSearch.site_name=item["title"]
-							infoSearch.save()
+						infoSearch.site_name = item["title"]
+						infoSearch.save()
+						for meta in metas:
+							keyw_l = Keyword.objects.get(keyword=meta)
+							infoSearch.site_keywords.add(keyw_l)
 						# for x in xrange(1, 10):
 						#   n_total.append(x)
 						#   res2 = service.cse().list( q=data, cx='011980423541542895616:ug0kbjbf6vm', gl='us', start=(x*10)+1, ).execute()
@@ -109,18 +108,23 @@ def check(request):
 
 						# print "Forbidden %s" %(error.code)
 					# pprint.pprint(all_metas)
-					return render(request, 'main/check.html', {'page': page, 'data': sorted(list(set(keywords))), 'do_search': data , 'search_city': search_city, 'search_country': search_country, "language": language, "metas": all_metas })
-				except KeyError as e:
-					form = PostForm()
-					return render(request, 'main/index.html', {'noitems': "No results %s" % e, 'form': form })
+					except KeyError as e:
+						form = PostForm()
+						return render(request, 'main/index.html', {'noitems': "No results %s" % e, 'form': form})
+					except IntegrityError:
+						pass
+				return render(request, 'main/check.html',
+							  {'page': page, 'data': sorted(list(set(keywords))), 'do_search': data,
+							   'search_city': search_city, 'search_country': search_country, "language": language})
 			except HttpError as error:
 				form = PostForm()
-				return render(request, 'main/index.html', {'limitreached': "You have reached the daily quota for your free plan. Please upgrade your plan. %s" % error , 'form': form })
+				return render(request, 'main/index.html', {'limitreached': "You have reached the daily quota for your free plan. Please upgrade your plan. %s" % error, 'form': form})
 	else:
 		form = PostForm()
 		return render(request, 'main/index.html', { 'form': form})
 
 
+# in use
 def get_links(url):
 	try:
 		page = urllib.request.urlopen(url)
@@ -132,9 +136,10 @@ def get_links(url):
 		return {"url": url, "links": contact, "error": ""}
 	except urllib.request.HTTPError as error:
 		contact = []
-		return {"url": url, "links": contact , "error": "No response %s" % url}
+		return {"url": url, "links": contact, "error": "No response %s" % url}
 
 
+# in use
 def valid_url(url):
 	val = URLValidator()
 	try:
@@ -144,10 +149,13 @@ def valid_url(url):
 	return True
 
 
+# in use
 def get_info(request):	
 	info_all = []
+	new_url = ""
 	try:
 		url = request.GET.get('url')
+		save_info = InfoSearch.objects.get(site_url=url)
 		splited_url = url.split("/")
 		new_url = "%s//%s" % (splited_url[0], splited_url[2])
 		contacto = get_links(new_url)
@@ -170,10 +178,17 @@ def get_info(request):
 						info_list = [re.sub("[^0-9()-]","", x) for x in info]
 						email = soup.findAll(text=re.compile('(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'))
 						info_all.append({"url": contacto["url"], "info": info_list, 'email': email, "found": url_contact})
+						save_info.site_contact_url = url_contact
+						save_info.site_email = email
+						for num in info_list:
+							phone_num = Phone(phone=num)
+							phone_num.save()
+							save_info.site_phones.add(phone_num)
+						save_info.save()
 						return JsonResponse(info_all, safe=False)
 					else:
 						info_all.append({"url": contacto["links"], "info": "No Valid URL on links %s" % url_contact, "email": "No Valid URL on links %s" % url_contact})
-						return JsonResponse(info, safe=False)
+						return JsonResponse(info_all, safe=False)
 			else:
 				html_doc = urllib.request.urlopen(new_url)
 				soup = BeautifulSoup(html_doc, 'html.parser')
@@ -182,6 +197,13 @@ def get_info(request):
 				info_list = [re.sub("[^0-9()-]","", x) for x in info]
 				email = soup.findAll(text=re.compile('(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'))
 				info_all.append({"url": contacto["url"], "info": info_list, 'email': email, "found": "No Contact URLs found"})
+				save_info.site_contact_url = "Not Found"
+				save_info.site_email = email
+				for num in info_list:
+					phone_num = Phone(phone=num)
+					phone_num.save()
+					save_info.site_phones.add(phone_num)
+				save_info.save()
 				return JsonResponse(info_all, safe=False)
 		else:
 			info_all.append({"url": contacto["url"], "info": "Error %s" % contacto["error"], 'email': "Error %s" % contacto["error"]})
@@ -192,13 +214,16 @@ def get_info(request):
 	except urllib.request.URLError as UrlError:
 		info_all.append({"url": new_url, "info": "No Valid URL on contact", "email": "No Valid URL on contact"})
 		return JsonResponse(info_all, safe=False)
+
 	return
 
 
+# no use
 def yellow_status(request):
 	return None
 
 
+# in use
 def yellow_ajax(request):
 	search = request.GET.get("search_str", None)
 	city = request.GET.get("search_city", None)
@@ -207,54 +232,70 @@ def yellow_ajax(request):
 	res = yellow_search.json()
 	if res["searchResult"]["metaProperties"]["message"] == "":
 		yellow = res["searchResult"]["searchListings"]["searchListing"]
-	
+	for item in yellow:
+		try:
+			yellow_save = InfoYellow.objects.get(site_name=item["businessName"])
+			print("Found %s" % yellow_save.site_name)
+		except InfoYellow.DoesNotExist:
+			yellow_save = InfoYellow()
+			yellow_save.site_name = item["businessName"]
+			yellow_save.site_url = item["websiteUrl"]
+			yellow_save.site_email = item["email"]
+			phone = Phone(phone=item["phone"])
+			yellow_save.site_phone.add(phone)
+			yellow_save.site_address = "%s %s" %(item["street"], item["state"])
+			yellow_save.save()
+
 	return JsonResponse(yellow, safe=False)	
 
 
+# no use
 def yellowsearch(search, city):
 	yellow_search = requests.get('http://api2.yp.com/listings/v1/search?searchloc=%s&term=%s&format=json&sort=name&listingcount=20&key=zpddvzj9cy' %(city, search))
 	#yellow_search = requests.get('http://api2.yp.com/listings/v1/search?searchloc=%s&term=%s&format=json&sort=name&listingcount=20&key=5t4k08tttp' %(city, search))
 	return yellow_search.json()
 
 
+# no use
 def place_detail(request):
 	place_id = request.GET.get('place_id', None)
 	url_detail= "https://maps.googleapis.com/maps/api/place/details/json?placeid=%s&key=AIzaSyCCw6wXXZqy0XpYQi17xjU66yhoto1XiVw" % place_id
 	google_detail = requests.get(url_detail)
 	sch_detail = google_detail.json()
 	data = {}
-	if(sch_detail["status"] == "OK"):
+	if sch_detail["status"] == "OK" :
 		data = {"address": sch_detail["result"]["formatted_address"], "number": sch_detail["result"]["international_phone_number"], "name": sch_detail["result"]["name"], "url": sch_detail["result"]["website"]}
 		return JsonResponse(data)
 	else:
 		return None
 
 
-def place_status(request):
+# def place_status(request):
+#
+# 	detail_places = []
+# 	for res in search["results"]:
+# 		plc_id = res["place_id"]
+# 		url_detail= "https://maps.googleapis.com/maps/api/place/details/json?placeid=%s&key=AIzaSyCCw6wXXZqy0XpYQi17xjU66yhoto1XiVw" % plc_id
+# 		google_detail = requests.get(url_detail)
+# 		sch_detail = google_detail.json()
+# 		if(sch_detail["status"] == "OK"):
+# 			try:
+# 				address = sch_detail["result"]["formatted_address"]
+# 				number = sch_detail["result"]["international_phone_number"]
+# 				name = sch_detail["result"]["name"]
+# 				url = sch_detail["result"]["website"]
+# 				detail_places.append({"address": address, "number": number, "name": name, "url": url})
+# 			except KeyError as e:
+# 				if e == "website":
+# 					detail_places.append({"address": address, "number": number, "name": name, "url": "Not found"})
+# 				elif e == "international_phone_number":
+# 					detail_places.append({"address": address, "number": "Not found", "name": name, "url": url})
+#
+# 		# print(res["name"])
+# 	return detail_places
 
-	detail_places = []
-	for res in search["results"]:
-		plc_id = res["place_id"]
-		url_detail= "https://maps.googleapis.com/maps/api/place/details/json?placeid=%s&key=AIzaSyCCw6wXXZqy0XpYQi17xjU66yhoto1XiVw" % plc_id
-		google_detail = requests.get(url_detail)
-		sch_detail = google_detail.json()
-		if(sch_detail["status"] == "OK"):
-			try: 
-				address = sch_detail["result"]["formatted_address"]
-				number = sch_detail["result"]["international_phone_number"]
-				name = sch_detail["result"]["name"]
-				url = sch_detail["result"]["website"]
-				detail_places.append({"address": address, "number": number, "name": name, "url": url})
-			except KeyError as e:
-				if e == "website":
-					detail_places.append({"address": address, "number": number, "name": name, "url": "Not found"})
-				elif e == "international_phone_number":
-					detail_places.append({"address": address, "number": "Not found", "name": name, "url": url})
-				
-		# print(res["name"])
-	return detail_places
-	 
 
+# no use
 def placesearch(search, city):
 	sch = search.replace(' ', '+')
 	cty = city.replace(' ', '+')
@@ -283,6 +324,7 @@ def placesearch(search, city):
 	return detail_places
 
 
+# in use
 def filter_ajax(request):
 	keys = request.GET.get('keys', None)
 	keys_list = keys.split(",")
@@ -303,11 +345,17 @@ def filter_ajax(request):
 		except Search.DoesNotExist as e:
 			search = Search(site_name=item["title"], site_url=item["link"])
 			search.save()
+		try:
+			search_inf = InfoSearch.objects.get(site_url=item["link"])
+		except InfoSearch.DoesNotExist as e:
+			search_inf = InfoSearch(site_url=item["link"])
+			search_inf.save()
 	for page in Search.objects.all():
 		contact.append({'url': page.site_url})
 	return JsonResponse(contact, safe=False)
 
 
+# in use
 def make_excel(request):
 	PATH_FULL = os.path.dirname(os.path.abspath(__file__))
 	file_path = os.path.join(PATH_FULL,'assets/unicode_name.xlsx')
@@ -322,6 +370,7 @@ def make_excel(request):
 	return JsonResponse(data, safe=False)
 
 
+# in use
 def excel_download(request):
 	PATH_FULL = os.path.dirname(os.path.abspath(__file__))
 	path = os.path.join(PATH_FULL, 'assets')
@@ -332,6 +381,7 @@ def excel_download(request):
 	return response
 
 
+# in use
 def filter(request):
 	if request.method == 'POST':
 		keys = request.POST.getlist('keys')
