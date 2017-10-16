@@ -240,7 +240,7 @@ def yellow_ajax(request):
 		except InfoYellow.DoesNotExist:
 			yellow_save = InfoYellow()
 			yellow_save.site_name = item["businessName"]
-			yellow_save.site_url = item["websiteUrl"]
+			yellow_save.site_url = item["websiteURL"]
 			yellow_save.site_email = item["email"]
 			phone = Phone(phone=item["phone"])
 			yellow_save.site_phone.add(phone)
