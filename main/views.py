@@ -231,7 +231,7 @@ def yellow_ajax(request):
 	yellow = []
 	yellow_search = requests.get('http://api2.yp.com/listings/v1/search?searchloc=%s&term=%s&format=json&sort=name&listingcount=20&key=5t4k08tttp' %(city, search))
 	res = yellow_search.json()
-	if res["result"]["metaProperties"]["message"] == "":
+	if res["searchResult"]["metaProperties"]["message"] == "":
 		yellow = res["searchResult"]["searchListings"]["searchListing"]
 	for item in yellow:
 		try:
