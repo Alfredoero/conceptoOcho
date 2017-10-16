@@ -16,6 +16,7 @@ from xlsxwriter.workbook import Workbook
 from wsgiref.util import FileWrapper
 from conceptoOcho.settings import PROJECT_ROOT
 #from .tasks import placesearch_task, yellowsearch_task
+from datetime import datetime
 import requests
 import chardet
 import pprint
@@ -360,11 +361,54 @@ def make_excel(request):
 	PATH_FULL = os.path.dirname(os.path.abspath(__file__))
 	file_path = os.path.join(PATH_FULL,'assets/unicode_name.xlsx')
 	workbook = Workbook(file_path)
-	worksheet = workbook.add_worksheet()
-	var1 = u'Zup nigga'
-	var2 = u'Zup bro'
-	worksheet.write('A1', var1)
-	worksheet.write('A2', var2)
+	worksheet = workbook.add_worksheet("Google Search")
+	worksheet2 = workbook.add_worksheet("Yellow Pages")
+	today = datetime.today()	
+	info = InfoSearch.objects.filter(search_date__year=today.year, search_date__month=today.month, search_date__day=today.day)
+	count = 2
+	worksheet.write('A1', "Sitio")
+	worksheet.write('B1', "Url")
+	worksheet.write('C1', "Telefonos")
+	worksheet.write('D1', "Email")
+	worksheet.write('E1', "Pagina Contacto")
+	for item in info:
+		worksheet.write('A%d' % count, item.site_name)
+		worksheet.write('B%d' % count, item.site_url)
+		phones = ""
+		num = 0
+		for phon in item.site_phones.all():
+			if num == 0:
+				phones += "%s" % phon.phone
+			else:
+				phones += ", %s " % phon.phone
+			num += 1
+		worksheet.write('C%d' % count, phones)
+		worksheet.write('D%d' % count, item.site_email)
+		worksheet.write('E%d' % count, item.site_contact_url)
+		count += 1
+
+	worksheet2.write('A1', "Sitio")
+	worksheet2.write('B1', "Url")
+	worksheet2.write('C1', "Telefonos")
+	worksheet2.write('D1', "Email")
+	worksheet2.write('E1', "Direccion")
+	yellow = YellowSearch.objects.filter(search_date__year=today.year, search_date__month=today.month, search_date__day=today.day)
+	for yell in yellow:
+		worksheet.write('A%d' % count, yell.site_name)
+		worksheet.write('B%d' % count, yell.site_url)
+		phones = ""
+		num = 0
+		for phon in yell.site_phones.all():
+			if num == 0:
+				phones += "%s" % phon.phone
+			else:
+				phones += ", %s " % phon.phone
+			num += 1
+		worksheet.write('C%d' % count, phones)
+		worksheet.write('D%d' % count, yell.site_email)
+		worksheet.write('E%d' % count, yell.site_address)
+		count += 1
+	#worksheet.write('A2', var2)
 	workbook.close()
 	data = {'status': "ok", "file_name": "name.xlsx"}
 	return JsonResponse(data, safe=False)
@@ -377,7 +421,7 @@ def excel_download(request):
 	file = open(os.path.join(path,"unicode_name.xlsx"), 'rb')
 	response = HttpResponse(FileWrapper(file), content_type='application/vnd.ms-excel') 
 	response['Content-Disposition'] = 'attachment; filename=excel.xlsx'
-	f.close()
+	file.close()
 	return response
 
 
