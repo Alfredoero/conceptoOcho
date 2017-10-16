@@ -242,10 +242,10 @@ def yellow_ajax(request):
 			yellow_save.site_name = item["businessName"]
 			yellow_save.site_url = item["websiteURL"]
 			yellow_save.site_email = item["email"]
-			phone = Phone(phone=item["phone"])
-			yellow_save.site_phone.add(phone)
+			phone = Phone(phone=item["phone"])			
 			yellow_save.site_address = "%s %s" %(item["street"], item["state"])
 			yellow_save.save()
+			yellow_save.site_phone.add(phone)
 
 	return JsonResponse(yellow, safe=False)	
 
