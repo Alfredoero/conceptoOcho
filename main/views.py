@@ -229,7 +229,7 @@ def yellow_ajax(request):
 	search = request.GET.get("search_str", None)
 	city = request.GET.get("search_city", None)
 	yellow = []
-	yellow_search = requests.get('http://api2.yp.com/listings/v1/search?searchloc=%s&term=%s&format=json&sort=name&listingcount=20&key=5t4k08tttp' %(city, search))
+	yellow_search = requests.get('http://api2.yp.com/listings/v1/search?searchloc=%s&term=%s&format=json&sort=name&listingcount=20&key=gxs0rc3yx0' %(city, search))
 	res = yellow_search.json()
 	if res["searchResult"]["metaProperties"]["message"] == "":
 		yellow = res["searchResult"]["searchListings"]["searchListing"]
