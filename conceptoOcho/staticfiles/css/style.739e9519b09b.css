@@ -16,6 +16,6 @@
     display: inline-block;
 }
 .google-res ol, .yellow-res ul{
-    overflow: auto;
-    height: 500px;
+    overflow-y: auto;
+    height: 570px;
 }

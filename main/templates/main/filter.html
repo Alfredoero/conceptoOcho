@@ -18,13 +18,16 @@
 	<div class="container">
 		<div class="row">
 			<div class="col">
-				<h1>Google Results <span class="load_google"><img src="{% static 'assets/Magnify.gif' %}" class="load-img" alt="Loading"></span></h1>
-				<ol class="google_ul">
-				</ol>
-                <h2>Yellow Pages Results</h2>
-                <ul class="yellow_ul">
-                    <li class="load_yellow"><span><img src="{% static 'assets/Magnify.gif' %}" class="load-img" alt="Loading"></span></li>
-                </ul>
+				<div class="row">	
+					<div class="col-6 google-res">	
+						<h1>Google Results <span class="load_google"><img src="{% static 'assets/Magnify.gif' %}" class="load-img" alt="Loading"></span></h1>
+						<ol class="google_ul"></ol>
+					</div>
+					<div class="col-6 yellow-res">	
+		                <h2>Yellow Pages Results <span class="load_yellow"><img src="{% static 'assets/Magnify.gif' %}" class="load-img" alt="Loading"></span></h2>
+		                <ul class="yellow_ul"></ul>
+					</div>
+				</div>
 				<!--h2>Places Results</h2>
 				<ul>
 					{ #% for place in places %#}
@@ -41,11 +44,12 @@
 				<p>
 					<form action="{% url 'index' %}" method="post">					
 					    {% csrf_token %}
-						<input type="submit" value="Atras">
+						<input type="submit" value="Back" class="btn btn-primary">
+						<div class="excel_link">
+							<a href="{% url 'excel_download' %} " class="btn btn-success excel" target="_blank">Excel</a>
+						</div>
 					</form>
-					<div class="excel_link">
-						<a href="{% url 'excel_download' %} " class="excel" target="_blank">Excel</a>						
-					</div>
+					
 				</p>
 				<input type="hidden" name="search" id="search" value="{{ search }}">
 				<input type="hidden" name="city" id="city" value="{{ city }}">
@@ -103,7 +107,7 @@
 			var country = $("#country").val();
 			var language = $("#language").val();
 			var lista = "";
-			$.ajax({
+			$.when($.ajax({
 		        url: '/ajax_filter/',
 		        data: {
 		          'search_str': search_str,
@@ -121,7 +125,15 @@
 		        	get_info(lista);
 		        }
 
+	      	})).then(function(data, statusText, jqXHR){
+				$.when($.ajax({url: '/ajax_excel/', dataType: 'json'}))
+		      	.then(function(data, statusText, jqXHR){
+		      		var link = "/files/";
+		      		$(".excel").attr('href', link);
+		      		$(".excel_link").show();
+		      	});
 	      	});
+			
 			
 			$.ajax({
 		        url: '/ajax_yellow/',
@@ -156,12 +168,7 @@
 		        	}
 		        }
 	      	});
-	      	/*$.when($.ajax({url: '/ajax_excel/', dataType: 'json'}))
-	      	.then(function(data, statusText, jqXHR){
-	      		var link = "/files/"+data.file_name;
-	      		//$(".excel").attr('href', link);
-	      		$(".excel_link").show();
-	      	});*/
+	      	
 	      	
 		});
 	</script>

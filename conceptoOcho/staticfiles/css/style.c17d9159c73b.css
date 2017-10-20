@@ -15,7 +15,7 @@
 .excel_link {
     display: inline-block;
 }
-.google-res ol, .yellow-res ul{
-    overflow: auto;
-    height: 500px;
+.google-res, .yellow-res {
+    overflow-y: auto;
+    height: 400px;
 }

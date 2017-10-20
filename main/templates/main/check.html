@@ -19,7 +19,7 @@
 	<div class="container">
 		<div class="row">
 			<div class="col">
-				<h1>Filter <a class="btn button" href="{% url 'index' %}">Atras</a></h1>
+				<h1><a class="btn btn-primary" href="{% url 'index' %}" role="button"><</a> Please check all meaningfull keywords </h1>
 				<div>
 					<form action="{% url 'filter' %}" method="post">
 					    {% csrf_token %}						
@@ -36,8 +36,8 @@
 						<input type="hidden" name="search_city" value="{{ search_city }}"/>
 						<input type="hidden" name="search_country" value="{{ search_country }}"/>
 						<input type="hidden" name="language" value="{{ language }}"/>
-					    <input type="submit" value="Submit" />
-					    <a class="btn button" href="{% url 'index' %}">Atras</a>
+					    <input type="submit" value="Submit" class="btn btn-primary" />
+					    <a class="btn btn-primary" href="{% url 'index' %}" role="button">Back</a>
 					</form>					
 				</div>
 			</div>

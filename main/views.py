@@ -394,21 +394,22 @@ def make_excel(request):
 	worksheet2.write('C1', "Telefonos")
 	worksheet2.write('D1', "Email")
 	worksheet2.write('E1', "Direccion")
-	yellow = YellowSearch.objects.filter(search_date__year=today.year, search_date__month=today.month, search_date__day=today.day)
+	yellow = InfoYellow.objects.filter(search_date__year=today.year, search_date__month=today.month, search_date__day=today.day)
+	count = 2
 	for yell in yellow:
-		worksheet.write('A%d' % count, yell.site_name)
-		worksheet.write('B%d' % count, yell.site_url)
+		worksheet2.write('A%d' % count, yell.site_name)
+		worksheet2.write('B%d' % count, yell.site_url)
 		phones = ""
 		num = 0
-		for phon in yell.site_phones.all():
+		for phon in yell.site_phone.all():
 			if num == 0:
 				phones += "%s" % phon.phone
 			else:
 				phones += ", %s " % phon.phone
 			num += 1
-		worksheet.write('C%d' % count, phones)
-		worksheet.write('D%d' % count, yell.site_email)
-		worksheet.write('E%d' % count, yell.site_address)
+		worksheet2.write('C%d' % count, phones)
+		worksheet2.write('D%d' % count, yell.site_email)
+		worksheet2.write('E%d' % count, yell.site_address)
 		count += 1
 	#worksheet.write('A2', var2)
 	workbook.close()
