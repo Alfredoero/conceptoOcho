@@ -87,6 +87,28 @@
 						}
 					}))
 					.then(function(data, statusText, jqXHR){
+					    var keys = $("#keys").val();
+					    var position = 0;
+					    $.when($.ajax({
+                            url: '/ajax_get_position/',
+                            data: { 'url': data[0].url, 'keys': keys },
+                            dataType: 'json',
+                            statusCode: {
+                                500: function(data){
+                                    current++;
+                                    console.log(data);
+                                    google_ul.append("<li><p>error 500 "+ data +"</p></li>");
+                                },
+                                503: function(data){
+                                    current++;
+                                    console.log(data);
+                                    google_ul.append("<li><p>Time out! error 503! "+ data +"</p></li>");
+                                }
+                            }
+                        }))
+                        .then(function(data, statusText, jqXHR){
+                            position = data[0].position;
+                        });
 						google_ul.append("<li><p><strong>Link:</strong> "+ data[0].url +"</p>"+
 								"<p><strong>Phones:</strong> "+ data[0].info +"</p>"+
 								"<p><strong>Emails:</strong> "+ data[0].email +"</p>"+
@@ -168,7 +190,6 @@
 		        	}
 		        }
 	      	});
-	      	
 	      	
 		});
 	</script>
