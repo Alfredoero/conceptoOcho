@@ -122,7 +122,7 @@ def check(request):
 				return render(request, 'main/index.html', {'limitreached': "You have reached the daily quota for your free plan. Please upgrade your plan. %s" % error, 'form': form})
 	else:
 		form = PostForm()
-		return render(request, 'main/index.html', { 'form': form})
+		return render(request, 'main/index.html', {'form': form})
 
 
 # in use
@@ -449,4 +449,41 @@ def filter(request):
 		return render(request, 'main/index.html', {'form': form})
 
 
+def get_position(request):
+	keys = request.GET.get('keys', None)
+	keys_list = keys.split(",")
+	link_src = request.GET.get('url', None)
+	do_search = request.GET.get('search_str', None)
+	search_city = request.GET.get('search_city', None)
+	search_country = request.GET.get('search_country', None)
+	language = request.GET.get('language', None)
+	contact = []
+	service = build("customsearch", "v1", developerKey="AIzaSyBfsEcEcNt4wtZq7iM5LV2gWfwnSQAD0cA")
+	if len(keys_list) > 0:
+		sumrise = 0
+		count = 0
+		for key in keys_list:
+			if count <= 2:
+				res = service.cse().list(q="%s -filetype:pdf" % (key),
+										 cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city,
+										 cr=search_country, hl=language, filter="1", ).execute()
+				posi_num = 0
+				for item in res["items"]:
+					posi_num += 1
+					if item["link"] == link_src:
+						return
+				if posi_num == 0:
+					sumrise += 10
+				else:
+					sumrise += posi_num
+				count += 1
+			else:
+				pass
+		posi = sumrise/len(count)
+	else:
+		res = service.cse().list(q="%s -filetype:pdf" % do_search, cx='011980423541542895616:ug0kbjbf6vm',
+								 hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()
+
+	contact.append({'position': 0})
+	return JsonResponse(contact, safe=False)
 
