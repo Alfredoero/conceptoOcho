@@ -21,9 +21,12 @@
 			<div class="col">
 				<h1><a class="btn btn-primary" href="{% url 'index' %}" role="button"><</a> Please check all meaningfull keywords </h1>
 				<div>
-					<form action="{% url 'filter' %}" method="post">
-					    {% csrf_token %}						
-					    {% for key in data %}
+                    <form action="{% url 'filter' %}" method="post">
+                        {% csrf_token %}
+                        <div class="checkbox">
+                            <label><input type="checkbox" name="select_all" id="select_all">Select All</label>
+                        </div>
+                        {% for key in data %}
 					    <div class="checkbox">
 						  	<label><input type="checkbox" name="keys[]" value="{{ key }}">{{ key }}</label>
 						</div>
@@ -51,6 +54,18 @@
 		$(document).on('submit', function(){
 			$(".loading").show();
 		});
+		$('#select_all').click(function(event) {
+            if(this.checked) {
+                // Iterate each checkbox
+                $(':checkbox').each(function() {
+                    this.checked = true;
+                });
+            } else {
+                $(':checkbox').each(function() {
+                    this.checked = false;
+                });
+            }
+        });
 	});
 	
 </script>
