@@ -96,18 +96,39 @@
                             dataType: 'json',
                             statusCode: {
                                 500: function(data){
-                                    current++;
                                     console.log(data);
                                     google_ul.append("<li><p>error 500 "+ data +"</p></li>");
+                                    if(current == totalReq){
+                                        $(".load_google").hide();
+                                        $.when($.ajax({url: '/ajax_excel/', dataType: 'json'}))
+                                        .then(function(data, statusText, jqXHR){
+                                            var link = "/files/";
+                                            $(".excel").attr('href', link);
+                                            $(".excel_link").show();
+                                        });
+                                    }else{
+                                        current++;
+                                    }
                                 },
                                 503: function(data){
-                                    current++;
                                     console.log(data);
                                     google_ul.append("<li><p>Time out! error 503! "+ data +"</p></li>");
+                                    if(current == totalReq){
+                                        $(".load_google").hide();
+                                        $.when($.ajax({url: '/ajax_excel/', dataType: 'json'}))
+                                        .then(function(data, statusText, jqXHR){
+                                            var link = "/files/";
+                                            $(".excel").attr('href', link);
+                                            $(".excel_link").show();
+                                        });
+                                    }else{
+                                        current++;
+                                    }
                                 }
                             }
                         }))
                         .then(function(data, statusText, jqXHR){
+                            console.log("entre total= "+totalReq+" current= "+ current);
                             position = data[0].position;
                             google_ul.append("<li><p><strong>Link:</strong> "+ info_data.url +"</p>"+
                                 "<p><strong>Phones:</strong> "+ info_data.info +"</p>"+
@@ -115,6 +136,7 @@
                                 "<p><strong>Contacts Links</strong> "+ info_data.found +"</p>"+
                                 "<p><strong>Position</strong> "+ position +"</p></li>");
                             var totalReq = $("#totalReq").val();
+
                             if(current == totalReq){
                                 $(".load_google").hide();
                                 $.when($.ajax({url: '/ajax_excel/', dataType: 'json'}))
