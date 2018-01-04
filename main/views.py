@@ -41,7 +41,6 @@ def check(request):
 			Search.objects.all().delete()
 			keywords = []
 			data = form.cleaned_data['do_search']
-			data = form.cleaned_data['do_search']
 			search_city = form.cleaned_data['search_city']
 			search_country = form.cleaned_data['search_country']
 			language = form.cleaned_data['language']
@@ -102,6 +101,7 @@ def check(request):
 								search.site_weight = total_weight
 							search.save()
 						infoSearch.site_name = item["title"]
+						infoSearch.related_search = data
 						infoSearch.save()
 						for meta in metas:
 							keyw_l = Keyword.objects.get(keyword=meta)
@@ -248,6 +248,8 @@ def yellow_ajax(request):
 			yellow_save.site_url = item["websiteURL"]
 			yellow_save.site_email = item["email"]
 			yellow_save.site_address = "%s %s" %(item["street"], item["state"])
+			yellow_save.related_search = search
+
 			yellow_save.save()
 			if(item["phone"] != ""):
 				phone = Phone(phone=item["phone"])	
@@ -294,7 +296,7 @@ def filter_ajax(request):
 		try:
 			search_inf = InfoSearch.objects.get(site_url=item["link"])
 		except InfoSearch.DoesNotExist as e:
-			search_inf = InfoSearch(site_url=item["link"])
+			search_inf = InfoSearch(site_url=item["link"], site_name=item["title"], related_search=do_search)
 			search_inf.save()
 	for page in Search.objects.all():
 		contact.append({'url': page.site_url})
