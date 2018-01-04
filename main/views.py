@@ -308,8 +308,8 @@ def make_excel(request):
 	workbook = Workbook(file_path)
 	worksheet = workbook.add_worksheet("Google Search")
 	worksheet2 = workbook.add_worksheet("Yellow Pages")
-	today = datetime.today()	
-	info = InfoSearch.objects.filter(search_date__year=today.year, search_date__month=today.month, search_date__day=today.day)
+	today = datetime.today()
+	info = InfoSearch.objects.filter(search_date__year=today.year, search_date__month=today.month, search_date__day=today.day).order_by('related_search')
 	count = 2
 	worksheet.write('A1', "Sitio")
 	worksheet.write('B1', "Url")
@@ -317,7 +317,17 @@ def make_excel(request):
 	worksheet.write('D1', "Email")
 	worksheet.write('E1', "Pagina Contacto")
 	worksheet.write('F1', "Ranking Promedio")
+	related = ""
 	for item in info:
+		if related == "":
+			related = item.related_search
+			worksheet.write('A%d' % count, 'busqueda relacionada = %s' % item.related_search)
+			count += 1
+		elif item.related_search != related:
+			related = item.related_search
+			worksheet.write('A%d' % count, 'busqueda relacionada = %s' % item.related_search)
+			count += 1
+
 		worksheet.write('A%d' % count, item.site_name)
 		worksheet.write('B%d' % count, item.site_url)
 		phones = ""
@@ -339,9 +349,19 @@ def make_excel(request):
 	worksheet2.write('C1', "Telefonos")
 	worksheet2.write('D1', "Email")
 	worksheet2.write('E1', "Direccion")
-	yellow = InfoYellow.objects.filter(search_date__year=today.year, search_date__month=today.month, search_date__day=today.day)
+	yellow = InfoYellow.objects.filter(search_date__year=today.year, search_date__month=today.month, search_date__day=today.day).order_by("related_search")
 	count = 2
+	related_yellow = ""
 	for yell in yellow:
+		if related_yellow == "":
+			related_yellow = yell.related_search
+			worksheet2.write('A%d' % count, 'busqueda relacionada= %s' %yell.related_search)
+			count += 1
+		elif related_yellow != yell.related_search:
+			related_yellow = yell.related_search
+			worksheet2.write('A%d' % count, 'busqueda relacionada= %s' %yell.related_search)
+			count += 1
+
 		worksheet2.write('A%d' % count, yell.site_name)
 		worksheet2.write('B%d' % count, yell.site_url)
 		phones = ""
