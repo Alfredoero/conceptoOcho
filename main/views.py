@@ -426,7 +426,7 @@ def get_position(request):
 	search_country = request.GET.get('search_country', None)
 	language = request.GET.get('language', None)
 	contact = []
-	info = InfoSearch.objects.get(site_url=link_src)
+	info = InfoSearch.objects.get(site_url="%s/" % link_src)
 	# service = build("customsearch", "v1", developerKey="AIzaSyBfsEcEcNt4wtZq7iM5LV2gWfwnSQAD0cA")  # enriquea.rodriguezr
 	# service = build("customsearch", "v1", developerKey="AIzaSyCkyySNSaqmDEt-1QaTzCiSUwWLN4aqhr8")  # arodriguez@teravisiontech.com
 	service = build("customsearch", "v1", developerKey="AIzaSyApeEnuK8qB9oELABnVcMGVZlB6wZWYCrw")  # aerodriguezr1712@gmail.com
