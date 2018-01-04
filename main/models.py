@@ -12,13 +12,22 @@ class Search(models.Model):
 	site_weight = models.CharField(max_length=10, blank=True, null=True)
 	site_status = models.CharField(max_length=200, blank=True, null=True)
 
+	def __str__(self):
+		return self.site_name
+
 
 class Phone(models.Model):
 	phone = models.CharField(max_length=20)
 
+	def __str__(self):
+		return self.phone
+
 
 class Keyword(models.Model):
 	keyword = models.CharField(max_length=300)
+
+	def __str__(self):
+		return self.keyword
 
 
 class InfoSearch(models.Model):
@@ -33,6 +42,9 @@ class InfoSearch(models.Model):
 	search_date = models.DateField(auto_now_add=True, blank=True)
 	average_ranking = models.CharField(max_length=10, blank=True, null=True)
 
+	def __str__(self):
+		return self.site_name
+
 
 class InfoYellow(models.Model):
 	site_name = models.CharField(max_length=300, unique=True)
@@ -42,3 +54,6 @@ class InfoYellow(models.Model):
 	site_address = models.CharField(max_length=500, blank=True, null=True)
 	related_search = models.CharField(max_length=500, blank=True, null=True)
 	search_date = models.DateField(auto_now_add=True, blank=True)
+
+	def __str__(self):
+		return self.site_name
