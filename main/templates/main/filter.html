@@ -117,6 +117,12 @@
                             var totalReq = $("#totalReq").val();
                             if(current == totalReq){
                                 $(".load_google").hide();
+                                $.when($.ajax({url: '/ajax_excel/', dataType: 'json'}))
+                                .then(function(data, statusText, jqXHR){
+                                    var link = "/files/";
+                                    $(".excel").attr('href', link);
+                                    $(".excel_link").show();
+                                });
                             }else{
                                 current++;
                             }
@@ -150,12 +156,7 @@
 		        }
 
 	      	})).then(function(data, statusText, jqXHR){
-				$.when($.ajax({url: '/ajax_excel/', dataType: 'json'}))
-		      	.then(function(data, statusText, jqXHR){
-		      		var link = "/files/";
-		      		$(".excel").attr('href', link);
-		      		$(".excel_link").show();
-		      	});
+				console.log("Done");
 	      	});
 			
 			

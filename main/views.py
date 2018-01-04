@@ -343,7 +343,7 @@ def make_excel(request):
 		worksheet.write('C%d' % count, phones)
 		worksheet.write('D%d' % count, item.site_email)
 		worksheet.write('E%d' % count, item.site_contact_url)
-		worksheet.write('F%d' % count, item.average_ranking)
+		worksheet.write('F%d' % count, "%s" % item.average_ranking)
 		count += 1
 
 	worksheet2.write('A1', "Sitio")
