@@ -19,11 +19,11 @@ class KeywordAdmin(admin.ModelAdmin):
 
 
 class InfoSearchAdmin(admin.ModelAdmin):
-    list_display = ('site_name', 'site_url', 'site_email', 'site_address', 'search_date')
+    list_display = ('site_name', 'site_url', 'site_email', 'site_address', 'search_date', 'related_search', 'average_ranking')
 
 
 class InfoYellowAdmin(admin.ModelAdmin):
-    list_display = ('site_name', 'site_url', 'site_email', 'site_address', 'search_date')
+    list_display = ('site_name', 'site_url', 'site_email', 'site_address', 'search_date', 'related_search')
 
 admin.site.register(Search, SearchAdmin)
 admin.site.register(Phone, PhoneAdmin)
