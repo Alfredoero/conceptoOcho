@@ -311,6 +311,7 @@ def make_excel(request):
 	worksheet.write('C1', "Telefonos")
 	worksheet.write('D1', "Email")
 	worksheet.write('E1', "Pagina Contacto")
+	worksheet.write('F1', "Ranking Promedio")
 	for item in info:
 		worksheet.write('A%d' % count, item.site_name)
 		worksheet.write('B%d' % count, item.site_url)
@@ -325,6 +326,7 @@ def make_excel(request):
 		worksheet.write('C%d' % count, phones)
 		worksheet.write('D%d' % count, item.site_email)
 		worksheet.write('E%d' % count, item.site_contact_url)
+		worksheet.write('F%d' % count, item.average_ranking)
 		count += 1
 
 	worksheet2.write('A1', "Sitio")
@@ -397,6 +399,7 @@ def get_position(request):
 	search_country = request.GET.get('search_country', None)
 	language = request.GET.get('language', None)
 	contact = []
+	info = InfoSearch.objects.get(site_url=link_src)
 	service = build("customsearch", "v1", developerKey="AIzaSyBfsEcEcNt4wtZq7iM5LV2gWfwnSQAD0cA")  # enriquea.rodriguezr
 	# service = build("customsearch", "v1", developerKey="AIzaSyCkyySNSaqmDEt-1QaTzCiSUwWLN4aqhr8")  # arodriguez@ateravisiontech.com
 	if len(keys_list) > 0:
@@ -415,13 +418,12 @@ def get_position(request):
 					sumrise += 10
 				else:
 					sumrise += posi_num
-				print("position %d key %s" % (posi_num, key))
 				count += 1
 			else:
 				pass
-		print("count = %d" % count)
 		posi = sumrise/count
-		print(posi)
+		info.average_ranking = posi
+		info.save()
 	else:
 		res = service.cse().list(q="%s -filetype:pdf" % do_search, cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()  # enriquea.rodriguezr
 		# res = service.cse().list(q="%s -filetype:pdf" % do_search, cx='013210873390130240871:lnlmh1y0yyg', hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()  # arodriguez@ateravisiontech.com
@@ -435,6 +437,8 @@ def get_position(request):
 			posi += 10
 		else:
 			posi += posi_num
+		info.average_ranking = posi
+		info.save()
 
 	contact.append({'position': posi})
 	return JsonResponse(contact, safe=False)

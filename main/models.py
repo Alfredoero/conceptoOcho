@@ -31,6 +31,7 @@ class InfoSearch(models.Model):
 	site_contact_url = models.CharField(max_length=2000, blank=True, null=True)
 	related_search = models.CharField(max_length=500, blank=True, null=True)
 	search_date = models.DateField(auto_now_add=True, blank=True)
+	average_ranking = models.CharField(max_length=10, blank=True, null=True)
 
 
 class InfoYellow(models.Model):
