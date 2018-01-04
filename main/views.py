@@ -41,13 +41,16 @@ def check(request):
 			Search.objects.all().delete()
 			keywords = []
 			data = form.cleaned_data['do_search']
+			data = form.cleaned_data['do_search']
 			search_city = form.cleaned_data['search_city']
 			search_country = form.cleaned_data['search_country']
 			language = form.cleaned_data['language']
 			page = request.POST.get("page")
 			try:
-				service = build("customsearch", "v1", developerKey="AIzaSyBfsEcEcNt4wtZq7iM5LV2gWfwnSQAD0cA")
-				res = service.cse().list(q="%s -filetype:pdf" % data, cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()
+				# service = build("customsearch", "v1", developerKey="AIzaSyBfsEcEcNt4wtZq7iM5LV2gWfwnSQAD0cA")  # enriquea.rodriguezr
+				service = build("customsearch", "v1", developerKey="AIzaSyCkyySNSaqmDEt-1QaTzCiSUwWLN4aqhr8")  # arodriguez@ateravisiontech.com
+				# res = service.cse().list(q="%s -filetype:pdf" % data, cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()  # enriquea.rodriguezr
+				res = service.cse().list(q="%s -filetype:pdf" % data, cx='013210873390130240871:lnlmh1y0yyg', hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()  # arodriguez@teravisiontech.com
 				all_links = []
 
 				for item in res["items"]:
@@ -236,7 +239,7 @@ def yellow_ajax(request):
 	for item in yellow:
 		try:
 			yellow_save = InfoYellow.objects.get(site_name=item["businessName"])
-			print("Found %s" % yellow_save.site_name)
+			# print("Found %s" % yellow_save.site_name)
 		except InfoYellow.DoesNotExist:
 			yellow_save = InfoYellow()
 			yellow_save.site_name = item["businessName"]
@@ -259,74 +262,6 @@ def yellowsearch(search, city):
 	return yellow_search.json()
 
 
-# no use
-def place_detail(request):
-	place_id = request.GET.get('place_id', None)
-	url_detail= "https://maps.googleapis.com/maps/api/place/details/json?placeid=%s&key=AIzaSyCCw6wXXZqy0XpYQi17xjU66yhoto1XiVw" % place_id
-	google_detail = requests.get(url_detail)
-	sch_detail = google_detail.json()
-	data = {}
-	if sch_detail["status"] == "OK" :
-		data = {"address": sch_detail["result"]["formatted_address"], "number": sch_detail["result"]["international_phone_number"], "name": sch_detail["result"]["name"], "url": sch_detail["result"]["website"]}
-		return JsonResponse(data)
-	else:
-		return None
-
-
-# def place_status(request):
-#
-# 	detail_places = []
-# 	for res in search["results"]:
-# 		plc_id = res["place_id"]
-# 		url_detail= "https://maps.googleapis.com/maps/api/place/details/json?placeid=%s&key=AIzaSyCCw6wXXZqy0XpYQi17xjU66yhoto1XiVw" % plc_id
-# 		google_detail = requests.get(url_detail)
-# 		sch_detail = google_detail.json()
-# 		if(sch_detail["status"] == "OK"):
-# 			try:
-# 				address = sch_detail["result"]["formatted_address"]
-# 				number = sch_detail["result"]["international_phone_number"]
-# 				name = sch_detail["result"]["name"]
-# 				url = sch_detail["result"]["website"]
-# 				detail_places.append({"address": address, "number": number, "name": name, "url": url})
-# 			except KeyError as e:
-# 				if e == "website":
-# 					detail_places.append({"address": address, "number": number, "name": name, "url": "Not found"})
-# 				elif e == "international_phone_number":
-# 					detail_places.append({"address": address, "number": "Not found", "name": name, "url": url})
-#
-# 		# print(res["name"])
-# 	return detail_places
-
-
-# no use
-def placesearch(search, city):
-	sch = search.replace(' ', '+')
-	cty = city.replace(' ', '+')
-	url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=%s+in+%s&key=AIzaSyCCw6wXXZqy0XpYQi17xjU66yhoto1XiVw" % (sch, cty)
-	google_places = requests.get(url)
-	search = google_places.json()
-	detail_places = []
-	for res in search["results"]:
-		plc_id = res["place_id"]
-		url_detail= "https://maps.googleapis.com/maps/api/place/details/json?placeid=%s&key=AIzaSyCCw6wXXZqy0XpYQi17xjU66yhoto1XiVw" % plc_id
-		google_detail = requests.get(url_detail)
-		sch_detail = google_detail.json()
-		if(sch_detail["status"] == "OK"):
-			try: 
-				address = sch_detail["result"]["formatted_address"]
-				number = sch_detail["result"]["international_phone_number"]
-				name = sch_detail["result"]["name"]
-				url = sch_detail["result"]["website"]
-				detail_places.append({"address": address, "number": number, "name": name, "url": url})
-			except KeyError as e:
-				if e == "website":
-					detail_places.append({"address": address, "number": number, "name": name, "url": "Not found"})
-				elif e == "international_phone_number":
-					detail_places.append({"address": address, "number": "Not found", "name": name, "url": url})
-				
-	return detail_places
-
-
 # in use
 def filter_ajax(request):
 	keys = request.GET.get('keys', None)
@@ -336,11 +271,14 @@ def filter_ajax(request):
 	search_country = request.GET.get('search_country', None)
 	language = request.GET.get('language', None)		
 	keys_string = ' '.join(keys_list)
-	service = build("customsearch", "v1", developerKey="AIzaSyBfsEcEcNt4wtZq7iM5LV2gWfwnSQAD0cA")
+	# service = build("customsearch", "v1", developerKey="AIzaSyBfsEcEcNt4wtZq7iM5LV2gWfwnSQAD0cA")  # enriquea.rodriguezr
+	service = build("customsearch", "v1", developerKey="AIzaSyCkyySNSaqmDEt-1QaTzCiSUwWLN4aqhr8")  # arodriguez@ateravisiontech.com
 	if len(keys_list) > 0:
-		res = service.cse().list(q="%s %s -filetype:pdf" % (do_search, keys_string), cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language,  filter="1", ).execute()
+		# res = service.cse().list(q="%s %s -filetype:pdf" % (do_search, keys_string), cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language,  filter="1", ).execute()  # enriquea.rodriguezr
+		res = service.cse().list(q="%s %s -filetype:pdf" % (do_search, keys_string), cx='013210873390130240871:lnlmh1y0yyg', hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()  # arodriguez@teravisiontech.com
 	else:
-		res = service.cse().list(q="%s -filetype:pdf" % do_search, cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language,  filter="1", ).execute()
+		# res = service.cse().list(q="%s -filetype:pdf" % do_search, cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language,  filter="1", ).execute()  # enriquea.rodriguezr
+		res = service.cse().list(q="%s -filetype:pdf" % do_search, cx='013210873390130240871:lnlmh1y0yyg', hq="near=%s" % search_city, cr=search_country, hl=language,  filter="1", ).execute()  # arodriguez@teravisiontech.com
 	contact = []
 	for item in res["items"]:
 		try:
@@ -431,12 +369,13 @@ def excel_download(request):
 # in use
 def filter(request):
 	if request.method == 'POST':
-		keys = request.POST.getlist('keys')
+		keys = request.POST.getlist('keys[]')
 		do_search = request.POST.get('do_search')
 		search_city = request.POST.get('search_city')
 		search_country = request.POST.get('search_country')
 		language = request.POST.get('language')
 		keys_string = ','.join(keys)
+		print(keys_string)
 		return render(request, 'main/filter.html', 
 			{	'search': do_search, 
 				'city': search_city,
@@ -458,32 +397,45 @@ def get_position(request):
 	search_country = request.GET.get('search_country', None)
 	language = request.GET.get('language', None)
 	contact = []
-	service = build("customsearch", "v1", developerKey="AIzaSyBfsEcEcNt4wtZq7iM5LV2gWfwnSQAD0cA")
+	# service = build("customsearch", "v1", developerKey="AIzaSyBfsEcEcNt4wtZq7iM5LV2gWfwnSQAD0cA")  # enriquea.rodriguezr
+	service = build("customsearch", "v1", developerKey="AIzaSyCkyySNSaqmDEt-1QaTzCiSUwWLN4aqhr8")  # arodriguez@ateravisiontech.com
 	if len(keys_list) > 0:
 		sumrise = 0
 		count = 0
 		for key in keys_list:
 			if count <= 2:
-				res = service.cse().list(q="%s -filetype:pdf" % (key),
-										 cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city,
-										 cr=search_country, hl=language, filter="1", ).execute()
+				# res = service.cse().list(q="%s -filetype:pdf" % (key), cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()  # enriquea.rodriguezr
+				res = service.cse().list(q="%s -filetype:pdf" % (key), cx='013210873390130240871:lnlmh1y0yyg', hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()  # arodriguez@ateravisiontech.com
 				posi_num = 0
 				for item in res["items"]:
 					posi_num += 1
 					if item["link"] == link_src:
-						return
+						break
 				if posi_num == 0:
 					sumrise += 10
 				else:
 					sumrise += posi_num
+				print("position %d key %s" % (posi_num, key))
 				count += 1
 			else:
 				pass
-		posi = sumrise/len(count)
+		print("count = %d" % count)
+		posi = sumrise/count
+		print(posi)
 	else:
-		res = service.cse().list(q="%s -filetype:pdf" % do_search, cx='011980423541542895616:ug0kbjbf6vm',
-								 hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()
+		# res = service.cse().list(q="%s -filetype:pdf" % do_search, cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()  # enriquea.rodriguezr
+		res = service.cse().list(q="%s -filetype:pdf" % do_search, cx='013210873390130240871:lnlmh1y0yyg', hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()  # arodriguez@ateravisiontech.com
+		posi_num = 0
+		posi = 0
+		for item in res["items"]:
+			posi_num += 1
+			if item["link"] == link_src:
+				break
+		if posi_num == 0:
+			posi += 10
+		else:
+			posi += posi_num
 
-	contact.append({'position': 0})
+	contact.append({'position': posi})
 	return JsonResponse(contact, safe=False)
 

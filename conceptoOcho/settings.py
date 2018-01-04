@@ -26,7 +26,7 @@ SECRET_KEY = '^*6+d0_8np5jeb5p!)6nu*@^o5g1zo0^zz7p6ec%rh@q-e#=8t'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["secret-taiga-35569.herokuapp.com", "localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["secret-taiga-35569.herokuapp.com", "localhost", "127.0.0.1","18.216.144.190", "13.58.55.38"]
 
 
 # Application definition

@@ -64,6 +64,7 @@
 		$(document).ready(function(){
 			var totalReq = 0;
 			$(".excel_link").hide();
+			var keys = $("#keys").val();
 			function get_info(list){
 				$("#totalReq").val(list.length);
 				google_ul = $(".google_ul");
@@ -77,7 +78,7 @@
 							500: function(data){
 								current++;
 								console.log(data);
-								google_ul.append("<li><p>error 500 "+ data +"</p></li>");
+								google_ul.append("<li><p>error 500 "+ data["statusText"] +"</p></li>");
 							},
 							503: function(data){								
 								current++;	
@@ -87,8 +88,8 @@
 						}
 					}))
 					.then(function(data, statusText, jqXHR){
-					    var keys = $("#keys").val();
 					    var position = 0;
+					    var info_data = data[0];
 					    $.when($.ajax({
                             url: '/ajax_get_position/',
                             data: { 'url': data[0].url, 'keys': keys },
@@ -108,24 +109,25 @@
                         }))
                         .then(function(data, statusText, jqXHR){
                             position = data[0].position;
+                            google_ul.append("<li><p><strong>Link:</strong> "+ info_data.url +"</p>"+
+                                "<p><strong>Phones:</strong> "+ info_data.info +"</p>"+
+                                "<p><strong>Emails:</strong> "+ info_data.email +"</p>"+
+                                "<p><strong>Contacts Links</strong> "+ info_data.found +"</p>"+
+                                "<p><strong>Position</strong> "+ position +"</p></li>");
+                            var totalReq = $("#totalReq").val();
+                            if(current == totalReq){
+                                $(".load_google").hide();
+                            }else{
+                                current++;
+                            }
                         });
-						google_ul.append("<li><p><strong>Link:</strong> "+ data[0].url +"</p>"+
-								"<p><strong>Phones:</strong> "+ data[0].info +"</p>"+
-								"<p><strong>Emails:</strong> "+ data[0].email +"</p>"+
-								"<p><strong>Contacts Links</strong> "+ data[0].found +"</p></li>");
-						var totalReq = $("#totalReq").val();
-						if(current == totalReq){
-							$(".load_google").hide();
-						}else{
-							current++;
-						}
-					});	
+                    });
 				}
 				//
 			}
 			var search_str = $("#search").val();
 			var search_city = $("#city").val();
-			var keys = $("#keys").val();
+
 			var country = $("#country").val();
 			var language = $("#language").val();
 			var lista = "";
