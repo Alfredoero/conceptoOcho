@@ -46,10 +46,10 @@ def check(request):
 			language = form.cleaned_data['language']
 			page = request.POST.get("page")
 			try:
-				service = build("customsearch", "v1", developerKey="AIzaSyBfsEcEcNt4wtZq7iM5LV2gWfwnSQAD0cA")  # enriquea.rodriguezr
-				res = service.cse().list(q="%s -filetype:pdf" % data, cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()  # enriquea.rodriguezr
-				# service = build("customsearch", "v1", developerKey="AIzaSyCkyySNSaqmDEt-1QaTzCiSUwWLN4aqhr8")  # arodriguez@ateravisiontech.com
-				# res = service.cse().list(q="%s -filetype:pdf" % data, cx='013210873390130240871:lnlmh1y0yyg', hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()  # arodriguez@teravisiontech.com
+				# service = build("customsearch", "v1", developerKey="AIzaSyBfsEcEcNt4wtZq7iM5LV2gWfwnSQAD0cA")  # enriquea.rodriguezr
+				# res = service.cse().list(q="%s -filetype:pdf" % data, cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()  # enriquea.rodriguezr
+				service = build("customsearch", "v1", developerKey="AIzaSyCkyySNSaqmDEt-1QaTzCiSUwWLN4aqhr8")  # arodriguez@ateravisiontech.com
+				res = service.cse().list(q="%s -filetype:pdf" % data, cx='013210873390130240871:lnlmh1y0yyg', hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()  # arodriguez@teravisiontech.com
 				# service = build("customsearch", "v1", developerKey="AIzaSyApeEnuK8qB9oELABnVcMGVZlB6wZWYCrw")  # aerodriguezr1712@gmail.com
 				# res = service.cse().list(q="%s -filetype:pdf" % data, cx='006779655238496411723:t_5t0k_hst0', hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()  # aerodriguezr@gmail.com
 				all_links = []
@@ -275,16 +275,16 @@ def filter_ajax(request):
 	search_country = request.GET.get('search_country', None)
 	language = request.GET.get('language', None)		
 	keys_string = ' '.join(keys_list)
-	service = build("customsearch", "v1", developerKey="AIzaSyBfsEcEcNt4wtZq7iM5LV2gWfwnSQAD0cA")  # enriquea.rodriguezr
-	# service = build("customsearch", "v1", developerKey="AIzaSyCkyySNSaqmDEt-1QaTzCiSUwWLN4aqhr8")  # arodriguez@ateravisiontech.com
+	# service = build("customsearch", "v1", developerKey="AIzaSyBfsEcEcNt4wtZq7iM5LV2gWfwnSQAD0cA")  # enriquea.rodriguezr
+	service = build("customsearch", "v1", developerKey="AIzaSyCkyySNSaqmDEt-1QaTzCiSUwWLN4aqhr8")  # arodriguez@ateravisiontech.com
 	# service = build("customsearch", "v1", developerKey="AIzaSyApeEnuK8qB9oELABnVcMGVZlB6wZWYCrw")  # arodriguez@ateravisiontech.com
 	if len(keys_list) > 0:
-		res = service.cse().list(q="%s %s -filetype:pdf" % (do_search, keys_string), cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language,  filter="1", ).execute()  # enriquea.rodriguezr
-		# res = service.cse().list(q="%s %s -filetype:pdf" % (do_search, keys_string), cx='013210873390130240871:lnlmh1y0yyg', hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()  # arodriguez@teravisiontech.com
+		# res = service.cse().list(q="%s %s -filetype:pdf" % (do_search, keys_string), cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language,  filter="1", ).execute()  # enriquea.rodriguezr
+		res = service.cse().list(q="%s %s -filetype:pdf" % (do_search, keys_string), cx='013210873390130240871:lnlmh1y0yyg', hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()  # arodriguez@teravisiontech.com
 		# res = service.cse().list(q="%s %s -filetype:pdf" % (do_search, keys_string), cx='006779655238496411723:t_5t0k_hst0', hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()  # aerodriguezr1712@gmail.com
 	else:
-		res = service.cse().list(q="%s -filetype:pdf" % do_search, cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language,  filter="1", ).execute()  # enriquea.rodriguezr
-		# res = service.cse().list(q="%s -filetype:pdf" % do_search, cx='013210873390130240871:lnlmh1y0yyg', hq="near=%s" % search_city, cr=search_country, hl=language,  filter="1", ).execute()  # arodriguez@teravisiontech.com
+		# res = service.cse().list(q="%s -filetype:pdf" % do_search, cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language,  filter="1", ).execute()  # enriquea.rodriguezr
+		res = service.cse().list(q="%s -filetype:pdf" % do_search, cx='013210873390130240871:lnlmh1y0yyg', hq="near=%s" % search_city, cr=search_country, hl=language,  filter="1", ).execute()  # arodriguez@teravisiontech.com
 		# res = service.cse().list(q="%s -filetype:pdf" % do_search, cx='006779655238496411723:t_5t0k_hst0', hq="near=%s" % search_city, cr=search_country, hl=language,  filter="1", ).execute()  # aerodriguezr1712@gmail.com
 	contact = []
 	for item in res["items"]:
@@ -430,16 +430,16 @@ def get_position(request):
 		info = InfoSearch.objects.get(site_url="%s/" % link_src)
 	except InfoSearch.DoesNotExist:
 		info = InfoSearch(site_url="%s/" % link_src)
-	service = build("customsearch", "v1", developerKey="AIzaSyBfsEcEcNt4wtZq7iM5LV2gWfwnSQAD0cA")  # enriquea.rodriguezr
-	# service = build("customsearch", "v1", developerKey="AIzaSyCkyySNSaqmDEt-1QaTzCiSUwWLN4aqhr8")  # arodriguez@teravisiontech.com
+	# service = build("customsearch", "v1", developerKey="AIzaSyBfsEcEcNt4wtZq7iM5LV2gWfwnSQAD0cA")  # enriquea.rodriguezr
+	service = build("customsearch", "v1", developerKey="AIzaSyCkyySNSaqmDEt-1QaTzCiSUwWLN4aqhr8")  # arodriguez@teravisiontech.com
 	# service = build("customsearch", "v1", developerKey="AIzaSyApeEnuK8qB9oELABnVcMGVZlB6wZWYCrw")  # aerodriguezr1712@gmail.com
 	if len(keys_list) > 0:
 		sumrise = 0
 		count = 0
 		for key in keys_list:
 			if count <= 2:
-				res = service.cse().list(q="%s -filetype:pdf" % (key), cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()  # enriquea.rodriguezr
-				# res = service.cse().list(q="%s -filetype:pdf" % (key), cx='013210873390130240871:lnlmh1y0yyg', hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()  # arodriguez@teravisiontech.com
+				# res = service.cse().list(q="%s -filetype:pdf" % (key), cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()  # enriquea.rodriguezr
+				res = service.cse().list(q="%s -filetype:pdf" % (key), cx='013210873390130240871:lnlmh1y0yyg', hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()  # arodriguez@teravisiontech.com
 				# res = service.cse().list(q="%s -filetype:pdf" % (key), cx='006779655238496411723:t_5t0k_hst0', hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()  # aerodriguezr1712@gmail.com
 				posi_num = 0
 				for item in res["items"]:
@@ -457,8 +457,8 @@ def get_position(request):
 		info.average_ranking = posi
 		info.save()
 	else:
-		res = service.cse().list(q="%s -filetype:pdf" % do_search, cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()  # enriquea.rodriguezr
-		# res = service.cse().list(q="%s -filetype:pdf" % do_search, cx='013210873390130240871:lnlmh1y0yyg', hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()  # arodriguez@ateravisiontech.com
+		# res = service.cse().list(q="%s -filetype:pdf" % do_search, cx='011980423541542895616:ug0kbjbf6vm', hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()  # enriquea.rodriguezr
+		res = service.cse().list(q="%s -filetype:pdf" % do_search, cx='013210873390130240871:lnlmh1y0yyg', hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()  # arodriguez@ateravisiontech.com
 		# res = service.cse().list(q="%s -filetype:pdf" % do_search, cx='006779655238496411723:t_5t0k_hst0', hq="near=%s" % search_city, cr=search_country, hl=language, filter="1", ).execute()  # aerodriguezr1712@teravisiontech.com
 		posi_num = 0
 		posi = 0
