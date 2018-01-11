@@ -868,9 +868,12 @@ LANG_CHOICES = (
 	("en", "English"),
 	("es", "Spanish"),
 )
+
+
 class PostForm(forms.Form):
 	do_search = forms.CharField(label='Search', max_length=200)
-	#num_results = forms.CharField(label='Result Number', max_length=20)
-	search_city = forms.CharField(label='City', widget=forms.Select(choices= CITIES_US))
-	search_country = forms.CharField(label='Country', widget=forms.Select(choices= CR_CHOICES))
-	language = forms.CharField(label='Language', widget=forms.Select(choices= LANG_CHOICES))
+	# num_results = forms.CharField(label='Result Number', max_length=20)
+	search_city = forms.CharField(label='City', widget=forms.Select(choices=CITIES_US), initial="Miami")
+	search_country = forms.CharField(label='Country', widget=forms.Select(choices=CR_CHOICES))
+	language = forms.CharField(label='Language', widget=forms.Select(choices=LANG_CHOICES))
+
