@@ -510,12 +510,12 @@ def get_spyfu_data(request):
 		print(api_req)
 		req_raw = requests.get(api_req)
 		req_json = req_raw.json()
-		count_click += req_json["organicGrid"]["rawEstimatedOrganicMonthlyClicks"]
+		count_click += float(req_json["organicGrid"]["rawEstimatedOrganicMonthlyClicks"])
 		api_req_cost = "https://www.spyfu.com/apis/core_api/get_term_metrics_us?term=%s&api_key=%s" % (key, api_key)
 		print(api_req_cost)
 		req_raw_cost = requests.get(api_req_cost)
 		req_json_cost = req_raw_cost.json()
-		paid_click_cost += req_json_cost["rawPhraseCostPerMonth"]
+		paid_click_cost += float(req_json_cost["rawPhraseCostPerMonth"])
 
 	contact.append({'countClicks': count_click, 'clickCost': paid_click_cost, 'top': top, 'ranking': ranking, 'phraseNumber': phrase_num})
 	return JsonResponse(contact, safe=False)
