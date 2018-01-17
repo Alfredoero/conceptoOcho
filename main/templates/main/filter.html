@@ -76,14 +76,34 @@
 						dataType: 'json',
 						statusCode: {
 							500: function(data){
-								current++;
 								console.log(data);
-								google_ul.append("<li><p>error 500 "+ data["statusText"] +"</p></li>");
+								google_ul.append("<li><p>error 500 "+ data["statusText"] +" from info request</p></li>");
+								if(current === totalReq){
+                                    $(".load_google").hide();
+                                    $.when($.ajax({url: '/ajax_excel/', dataType: 'json'}))
+                                    .then(function(data, statusText, jqXHR){
+                                        var link = "/files/";
+                                        $(".excel").attr('href', link);
+                                        $(".excel_link").show();
+                                    });
+                                }else{
+                                    current++;
+                                }
 							},
-							503: function(data){								
-								current++;	
+							503: function(data){
 								console.log(data);
-								google_ul.append("<li><p>Time out! error 503! "+ data +"</p></li>");
+								google_ul.append("<li><p>Time out! error 503! "+ data["statusText"] +" from info request</p></li>");
+								if(current === totalReq){
+                                    $(".load_google").hide();
+                                    $.when($.ajax({url: '/ajax_excel/', dataType: 'json'}))
+                                    .then(function(data, statusText, jqXHR){
+                                        var link = "/files/";
+                                        $(".excel").attr('href', link);
+                                        $(".excel_link").show();
+                                    });
+                                }else{
+                                    current++;
+                                }
 							}
 						}
 					}))
@@ -97,8 +117,8 @@
                             statusCode: {
                                 500: function(data){
                                     console.log(data);
-                                    google_ul.append("<li><p>error 500 "+ data +"</p></li>");
-                                    if(current == totalReq){
+                                    google_ul.append("<li><p>error 500 "+ data["statusText"] +" from position request</p></li>");
+                                    if(current === totalReq){
                                         $(".load_google").hide();
                                         $.when($.ajax({url: '/ajax_excel/', dataType: 'json'}))
                                         .then(function(data, statusText, jqXHR){
@@ -112,8 +132,8 @@
                                 },
                                 503: function(data){
                                     console.log(data);
-                                    google_ul.append("<li><p>Time out! error 503! "+ data +"</p></li>");
-                                    if(current == totalReq){
+                                    google_ul.append("<li><p>Time out! error 503! "+ data["statusText"] +" from position request</p></li>");
+                                    if(current === totalReq){
                                         $(".load_google").hide();
                                         $.when($.ajax({url: '/ajax_excel/', dataType: 'json'}))
                                         .then(function(data, statusText, jqXHR){
@@ -128,26 +148,69 @@
                             }
                         }))
                         .then(function(data, statusText, jqXHR){
-                            console.log("entre total= "+totalReq+" current= "+ current);
                             position = data[0].position;
-                            google_ul.append("<li><p><strong>Link:</strong> "+ info_data.url +"</p>"+
-                                "<p><strong>Phones:</strong> "+ info_data.info +"</p>"+
-                                "<p><strong>Emails:</strong> "+ info_data.email +"</p>"+
-                                "<p><strong>Contacts Links</strong> "+ info_data.found +"</p>"+
-                                "<p><strong>Position</strong> "+ position +"</p></li>");
-                            var totalReq = $("#totalReq").val();
+                            var keys_count = data[0].key_count;
+                            $.when($.ajax({
+                                url: '/ajax_get_spyfu/',
+                                data: { 'url': data[0].url, 'keys': keys, 'key_count': keys_count, 'position': position },
+                                dataType: 'json',
+                                statusCode: {
+                                    500: function(data){
+                                        console.log(data);
+                                        google_ul.append("<li><p>error 500 "+ data["statusText"] +" from spyfu request</p></li>");
+                                        if(current === totalReq){
+                                            $(".load_google").hide();
+                                            $.when($.ajax({url: '/ajax_excel/', dataType: 'json'}))
+                                            .then(function(data, statusText, jqXHR){
+                                                var link = "/files/";
+                                                $(".excel").attr('href', link);
+                                                $(".excel_link").show();
+                                            });
+                                        }else{
+                                            current++;
+                                        }
+                                    },
+                                    503: function(data){
+                                        console.log(data);
+                                        google_ul.append("<li><p>Time out! error 503! "+ data["statusText"] +" from spyfu request</p></li>");
+                                        if(current === totalReq){
+                                            $(".load_google").hide();
+                                            $.when($.ajax({url: '/ajax_excel/', dataType: 'json'}))
+                                            .then(function(data, statusText, jqXHR){
+                                                var link = "/files/";
+                                                $(".excel").attr('href', link);
+                                                $(".excel_link").show();
+                                            });
+                                        }else{
+                                            current++;
+                                        }
+                                    }
+                                }
+                            }))
+                            .then(function(data, statusText, jqXHR){
+                                var spyfu_data = data[0];
+                                google_ul.append("<li><p><strong>Link:</strong> "+ info_data.url +"</p>"+
+                                    "<p><strong>Phones:</strong> "+ info_data.info +"</p>"+
+                                    "<p><strong>Emails:</strong> "+ info_data.email +"</p>"+
+                                    "<p><strong>Contacts Links</strong> "+ info_data.found +"</p>"+
+                                    "<p><strong>Position</strong> "+ position +"</p>"+
+                                    "<p><strong>Phrases Number</strong> "+ spyfu_data.phraseNumber +"</p>"+
+                                    "<p><strong>Click Cost</strong> "+ spyfu_data.clickCost +"</p>"+
+                                    "<p><strong>Click Count</strong> "+ spyfu_data.countClicks +"</p></li>");
+                                var totalReq = $("#totalReq").val();
 
-                            if(current == totalReq){
-                                $(".load_google").hide();
-                                $.when($.ajax({url: '/ajax_excel/', dataType: 'json'}))
-                                .then(function(data, statusText, jqXHR){
-                                    var link = "/files/";
-                                    $(".excel").attr('href', link);
-                                    $(".excel_link").show();
-                                });
-                            }else{
-                                current++;
-                            }
+                                if(current === totalReq){
+                                    $(".load_google").hide();
+                                    $.when($.ajax({url: '/ajax_excel/', dataType: 'json'}))
+                                        .then(function(data, statusText, jqXHR){
+                                            var link = "/files/";
+                                            $(".excel").attr('href', link);
+                                            $(".excel_link").show();
+                                        });
+                                }else{
+                                    current++;
+                                }
+                            });
                         });
                     });
 				}
