@@ -306,7 +306,7 @@ def filter_ajax(request):
 # in use
 def make_excel(request):
 	PATH_FULL = os.path.dirname(os.path.abspath(__file__))
-	file_path = os.path.join(PATH_FULL,'assets/unicode_name.xlsx')
+	file_path = os.path.join(PATH_FULL, 'assets/unicode_name.xlsx')
 	workbook = Workbook(file_path)
 	worksheet = workbook.add_worksheet("Google Search")
 	worksheet2 = workbook.add_worksheet("Yellow Pages")
