@@ -509,7 +509,7 @@ def get_spyfu_data(request):
 		api_req = "https://www.spyfu.com/apis/core_api/get_term_ranking_urls_us?term=%s&api_key=%s" % (key, api_key)
 		req_raw = requests.get(api_req)
 		req_json = req_raw.json()
-		count_click += float(req_json["organicGrid"]["rawEstimatedOrganicMonthlyClicks"])
+		count_click += float(req_json["organicGrid"][0]["rawEstimatedOrganicMonthlyClicks"])
 		api_req_cost = "https://www.spyfu.com/apis/core_api/get_term_metrics_us?term=%s&api_key=%s" % (key, api_key)
 		req_raw_cost = requests.get(api_req_cost)
 		req_json_cost = req_raw_cost.json()
