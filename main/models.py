@@ -42,6 +42,7 @@ class InfoSearch(models.Model):
 	search_date = models.DateField(auto_now_add=True, blank=True)
 	average_ranking = models.CharField(max_length=10, blank=True, null=True)
 	top_ranking = models.CharField(max_length=5, blank=True, null=True)
+	search_nums = models.CharField(max_length=5, blank=True, null=True)
 	click_cost = models.DecimalField(decimal_places=2, max_digits=10, blank=True, null=True)
 	click_aditional = models.DecimalField(decimal_places=2, max_digits=10, blank=True, null=True)
 

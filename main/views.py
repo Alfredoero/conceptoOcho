@@ -319,6 +319,7 @@ def make_excel(request):
 	worksheet.write('D1', "Email")
 	worksheet.write('E1', "Pagina Contacto")
 	worksheet.write('F1', "Ranking Promedio")
+	worksheet.write('G1', "Oppotunity")
 	related = ""
 	for item in info:
 		if related == "":
@@ -344,6 +345,7 @@ def make_excel(request):
 		worksheet.write('D%d' % count, item.site_email)
 		worksheet.write('E%d' % count, item.site_contact_url)
 		worksheet.write('F%d' % count, "%s" % item.average_ranking)
+		worksheet.write('G%d' % count, "You currently rank somewhere in the top %s on %s search phrases on Google. If you could land number one spot for all those searches, you'd get about %s additional clicks per month. That would cost you more than $%s in equivalent PPC dollars." % item.top_ranking, item.search_nums, item.click_aditional, item.click_cost)
 		count += 1
 
 	worksheet2.write('A1', "Sitio")
@@ -493,6 +495,7 @@ def get_spyfu_data(request):
 
 	# numero de keywords en los que se busco el dominio
 	phrase_num = request.GET.get('key_count', None)
+	info.search_nums = phrase_num
 	phrases = keys.split(",")
 
 	# depende de la profundidad en la cual se busca el dominio, ej: si se busco en las primeras 5 paginas de la
