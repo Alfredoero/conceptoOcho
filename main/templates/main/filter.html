@@ -89,6 +89,7 @@
                                 }else{
                                     current++;
                                 }
+                                console.log("500 info current= "+current);
 							},
 							503: function(data){
 								console.log(data);
@@ -104,6 +105,7 @@
                                 }else{
                                     current++;
                                 }
+                                console.log("503 info current= "+current);
 							}
 						}
 					}))
@@ -129,6 +131,7 @@
                                     }else{
                                         current++;
                                     }
+                                    console.log("500 position current= "+current);
                                 },
                                 503: function(data){
                                     console.log(data);
@@ -144,6 +147,7 @@
                                     }else{
                                         current++;
                                     }
+                                    console.log("503 position current= "+current);
                                 }
                             }
                         }))
@@ -169,6 +173,7 @@
                                         }else{
                                             current++;
                                         }
+                                        console.log("500 spyfu current= "+current);
                                     },
                                     503: function(data){
                                         console.log(data);
@@ -184,6 +189,7 @@
                                         }else{
                                             current++;
                                         }
+                                        console.log("503 spyfu current= "+current);
                                     }
                                 }
                             }))
@@ -210,6 +216,7 @@
                                 }else{
                                     current++;
                                 }
+                                console.log("200 spyfu current= "+current);
                             });
                         });
                     });
