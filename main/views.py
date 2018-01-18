@@ -488,7 +488,7 @@ def get_spyfu_data(request):
 	# numero de keywords en los que se busco el dominio
 	phrase_num = request.GET.get('key_count', None)
 	phrases = keys.split(",")
-	print(phrases)
+
 	# depende de la profundidad en la cual se busca el dominio, ej: si se busco en las primeras 5 paginas de la
 	# busqueda de google seria el top 50 contando con que cada pagina son 10 pocisiones
 	top = int(phrase_num) * 10
@@ -505,14 +505,12 @@ def get_spyfu_data(request):
 		key = key.replace("[", "")
 		key = key.replace("'", "")
 		key = key.replace("]", "")
-		print(key)
+
 		api_req = "https://www.spyfu.com/apis/core_api/get_term_ranking_urls_us?term=%s&api_key=%s" % (key, api_key)
-		print(api_req)
 		req_raw = requests.get(api_req)
 		req_json = req_raw.json()
 		count_click += float(req_json["organicGrid"]["rawEstimatedOrganicMonthlyClicks"])
 		api_req_cost = "https://www.spyfu.com/apis/core_api/get_term_metrics_us?term=%s&api_key=%s" % (key, api_key)
-		print(api_req_cost)
 		req_raw_cost = requests.get(api_req_cost)
 		req_json_cost = req_raw_cost.json()
 		paid_click_cost += float(req_json_cost["rawPhraseCostPerMonth"])
