@@ -91,6 +91,22 @@
                                 }
                                 console.log("500 info current= "+current);
 							},
+							502: function(data){
+								console.log(data);
+								google_ul.append("<li><p>error 502 "+ data["statusText"] +" from info request</p></li>");
+								if(current == totalReq){
+                                    $(".load_google").hide();
+                                    $.when($.ajax({url: '/ajax_excel/', dataType: 'json'}))
+                                    .then(function(data, statusText, jqXHR){
+                                        var link = "/files/";
+                                        $(".excel").attr('href', link);
+                                        $(".excel_link").show();
+                                    });
+                                }else{
+                                    current++;
+                                }
+                                console.log("502 info current= "+current);
+							},
 							503: function(data){
 								console.log(data);
 								google_ul.append("<li><p>Time out! error 503! "+ data["statusText"] +" from info request</p></li>");
@@ -133,6 +149,22 @@
                                     }
                                     console.log("500 position current= "+current);
                                 },
+                                502: function(data){
+                                    console.log(data);
+                                    google_ul.append("<li><p>error 502 "+ data["statusText"] +" from position request</p></li>");
+                                    if(current == totalReq){
+                                        $(".load_google").hide();
+                                        $.when($.ajax({url: '/ajax_excel/', dataType: 'json'}))
+                                        .then(function(data, statusText, jqXHR){
+                                            var link = "/files/";
+                                            $(".excel").attr('href', link);
+                                            $(".excel_link").show();
+                                        });
+                                    }else{
+                                        current++;
+                                    }
+                                    console.log("502 position current= "+current);
+                                },
                                 503: function(data){
                                     console.log(data);
                                     google_ul.append("<li><p>Time out! error 503! "+ data["statusText"] +" from position request</p></li>");
@@ -174,6 +206,22 @@
                                             current++;
                                         }
                                         console.log("500 spyfu current= "+current);
+                                    },
+                                    502: function(data){
+                                        console.log(data);
+                                        google_ul.append("<li><p>error 502 "+ data["statusText"] +" from spyfu request</p></li>");
+                                        if(current == totalReq){
+                                            $(".load_google").hide();
+                                            $.when($.ajax({url: '/ajax_excel/', dataType: 'json'}))
+                                            .then(function(data, statusText, jqXHR){
+                                                var link = "/files/";
+                                                $(".excel").attr('href', link);
+                                                $(".excel_link").show();
+                                            });
+                                        }else{
+                                            current++;
+                                        }
+                                        console.log("502 spyfu current= "+current);
                                     },
                                     503: function(data){
                                         console.log(data);
