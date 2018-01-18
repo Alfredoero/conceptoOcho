@@ -152,7 +152,7 @@
                             var keys_count = data[0].key_count;
                             $.when($.ajax({
                                 url: '/ajax_get_spyfu/',
-                                data: { 'url': data[0].url, 'keys': keys, 'key_count': keys_count, 'position': position },
+                                data: { 'url': info_data.url, 'keys': keys, 'key_count': keys_count, 'position': position },
                                 dataType: 'json',
                                 statusCode: {
                                     500: function(data){

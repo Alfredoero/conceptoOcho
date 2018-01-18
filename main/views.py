@@ -480,10 +480,16 @@ def get_position(request):
 
 def get_spyfu_data(request):
 	keys = request.GET.get('keys', None)
+	link_src = request.GET.get('url', None)
+	try:
+		info = InfoSearch.objects.get(site_url="%s/" % link_src)
+	except InfoSearch.DoesNotExist:
+		info = InfoSearch(site_url="%s/" % link_src)
 	contact = []
 
 	# Posicion del dominio dentro del top
 	ranking = request.GET.get('position', None)
+	info.average_ranking = ranking
 
 	# numero de keywords en los que se busco el dominio
 	phrase_num = request.GET.get('key_count', None)
@@ -492,6 +498,7 @@ def get_spyfu_data(request):
 	# depende de la profundidad en la cual se busca el dominio, ej: si se busco en las primeras 5 paginas de la
 	# busqueda de google seria el top 50 contando con que cada pagina son 10 pocisiones
 	top = int(phrase_num) * 10
+	info.top_ranking = top
 
 	# numero de click adicionales en caso de lograr el primer lugar en cada keyword buscado
 	additional_clicks = ""
@@ -515,6 +522,9 @@ def get_spyfu_data(request):
 		req_json_cost = req_raw_cost.json()
 		paid_click_cost += float(req_json_cost["rawPhraseCostPerMonth"])
 
+	info.click_aditional = count_click
+	info.click_cost = paid_click_cost
+	info.save()
 	contact.append({'countClicks': count_click, 'clickCost': paid_click_cost, 'top': top, 'ranking': ranking, 'phraseNumber': phrase_num})
 	return JsonResponse(contact, safe=False)
 
