@@ -24,11 +24,11 @@
                     <form action="{% url 'filter' %}" method="post">
                         {% csrf_token %}
                         <div class="checkbox">
-                            <label><input type="checkbox" name="select_all" id="select_all">Select All</label>
+                            <label><input type="checkbox" name="select_all" id="select_all">&nbsp;&nbsp;Select All</label>
                         </div>
                         {% for key in data %}
 					    <div class="checkbox">
-						  	<label><input type="checkbox" name="keys[]" value="{{ key }}">{{ key }}</label>
+						  	<label><input type="checkbox" name="keys[]" value="{{ key }}">&nbsp;&nbsp;{{ key }}</label>
 						</div>
 						{% empty %}
 						<div class="checkbox">
